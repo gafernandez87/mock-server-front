@@ -31,3 +31,25 @@
     transform: rotate(360deg);
   }
 }
+
+.endpointCard{
+  width: 400;
+  margin-bottom: 10px;
+}
+
+.endpointCard:hover{
+  background-color: #aecbe8;
+  cursor: pointer;
+}
+
+.endpointCard.selected{
+  background-color: #aecbe8;
+}
+
+.error textarea{
+  border: 1px solid red !important;
+}
+
+.error p{
+  color: red;
+}
