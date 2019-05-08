@@ -1,5 +1,5 @@
 import React from 'react'
-import Mocks from './Mocks';
+import MockList from './MockList';
 import EndpointList from './EndpointList';
 import axios from 'axios';
 
@@ -27,14 +27,18 @@ class BodyContent extends React.Component{
     renderBody = (page) => {
         switch(page){
             case "mocks":
-              return (<Mocks list={this.props.mockList} showMock={this.showMock} />)
+              return (<MockList 
+                  list={this.props.mockList} 
+                  showMock={this.showMock} 
+                  deleteMock={this.props.deleteMock} />)
+
             case "endpoints":
               return (<EndpointList 
                   list={this.props.endpointList} 
                   refreshEndpointList={this.props.refreshEndpointList}
                   getMockId={this.getMockId} />)
             default:
-              return (<div>You should not be here</div>)
+              return (<div>You should not be here... RUN!</div>)
         }
     }
     

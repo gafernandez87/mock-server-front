@@ -34,8 +34,24 @@ class MockCard extends React.Component{
         this.setState({cardStyle})
     }
 
+    formatDate = (date) => {
+        let creationDate = ""
+        if(date){
+            creationDate = new Date(date)
+            return creationDate.getDate() + "/" 
+                    + (creationDate.getMonth() + 1) + "/" 
+                    + creationDate.getFullYear() + " " 
+                    + creationDate.getHours() + ":" 
+                    + creationDate.getMinutes() + ":" 
+                    + creationDate.getSeconds() 
+        }
+        return creationDate
+    }
+
     render(){
         const {item, index} = this.props
+        
+
         return (
             <List.Item 
                 onMouseEnter={this.enter}
@@ -48,7 +64,8 @@ class MockCard extends React.Component{
                 title={<b>{item.name}</b>}
                 description={item.description}
                 />
-                <b>Author:</b> {item.author}
+                <b>Author:</b> {item.author}<br />
+                <b>Creation date:</b> {this.formatDate(item.creation_date)}
             </List.Item>
         )
     }

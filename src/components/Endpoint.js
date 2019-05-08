@@ -1,8 +1,8 @@
 import React from 'react'
-import { Card,  Form, Input, Select, Button, Affix, Alert } from 'antd';
+import { Card,  Form, Input, Select, Button, Affix, Alert, Modal } from 'antd';
 
 const { Option } = Select;
-
+const confirm = Modal.confirm;
 class Endpoint extends React.Component{
 
     getSaveMessage = () => {
@@ -28,6 +28,18 @@ class Endpoint extends React.Component{
             default:
                 break;
         }
+    }
+
+    showDeleteConfirm = (deleteEndpoint) => {
+        confirm({
+            title: 'Are you sure delete this Endpoint?',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                deleteEndpoint()
+            }
+        });
     }
 
     render() {
@@ -97,8 +109,8 @@ class Endpoint extends React.Component{
                             />
                             {this.props.bodyClass === "error" ? <p>Invalid JSON. Please fix it before hitting save</p> : ""}
                         </Form.Item>
-                        <Button type="primary" onClick={() => this.props.saveEndpoint()}>{this.getButtonText()}</Button>
-                        {!this.props.isNewEndpoint && <Button type="danger" style={{float: "right"}} onClick={this.props.deleteEndpoint}>Delete</Button> }
+                        <Button type="primary" onClick={() => this.props.saveEndpoint()} style={{float: "right"}}>{this.getButtonText()}</Button>
+                        {!this.props.isNewEndpoint && <Button type="danger" onClick={() => this.showDeleteConfirm(this.props.deleteEndpoint)}>Delete</Button> }
                     </Form>
                 </Card>
             </Affix>

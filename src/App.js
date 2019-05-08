@@ -49,8 +49,20 @@ class App extends React.Component {
     this.setState({endpointList})
   }
 
-  updateMockList = (mockList) => {
-    this.setState({mockList})
+  deleteMock = (mockId) => {
+    axios.delete(`http://localhost:8000/mocks/${mockId}`)
+    .then(data => {
+        console.log("Delete result", data)
+        return axios.get(`http://localhost:8000/mocks`)
+    })
+    .then(result => {
+      this.setState({mockList: result.data})
+    }).catch(err => {
+        console.error(err)
+        this.setState({
+            saveStatus: "error"
+        })
+    })
   }
 
   refreshEndpointList = (mockId) => {
@@ -90,9 +102,9 @@ class App extends React.Component {
                 mockList={this.state.mockList}
                 endpointList={this.state.endpointList }
                 changePage={this.changePage}
-                updateMockList={this.updateMockList}
                 updateEndpointList={this.updateEndpointList}
                 refreshEndpointList={this.refreshEndpointList}
+                deleteMock={this.deleteMock}
               />
             </Content>
           </Layout>
