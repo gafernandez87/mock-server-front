@@ -75,6 +75,16 @@ class App extends React.Component {
     })
   }
 
+  refreshMockList = () => {
+    axios.get(`http://localhost:8000/mocks`)
+    .then(response => {
+      this.setState({mockList: response.data})
+    }).catch(err => {
+      console.error(err)
+      this.setState({currentPage: "mocks"})
+    })
+  }
+
   render() {
     return (
       <Layout>
@@ -104,6 +114,7 @@ class App extends React.Component {
                 changePage={this.changePage}
                 updateEndpointList={this.updateEndpointList}
                 refreshEndpointList={this.refreshEndpointList}
+                refreshMockList={this.refreshMockList}
                 deleteMock={this.deleteMock}
               />
             </Content>

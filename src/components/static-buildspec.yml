@@ -1,0 +1,49 @@
+version: 0.2
+
+env:
+  variables:
+    owner: Integrations
+
+phases:
+  install:
+    commands:
+      # Install http drivers for node
+      - sudo apt-get update -y
+      - echo installing dependencies...
+      - npm rebuild node-sass --force
+      - npm install
+
+  build:
+    commands:
+      # Builds Angular application. You can also build using custom environment here like mock or staging
+      - echo Build started on `date`
+      - echo Env is ${BUILD_ENV}
+      - echo SERVICE_NAME is ${SERVICE_NAME}
+      - echo AMBIENTES is ${AMBIENTES}
+      - echo REACT_APP_ENV is ${REACT_APP_ENV}
+      - export REACT_APP_BRAND=${BRAND}
+      - echo REACT_APP_BRAND is ${REACT_APP_BRAND}
+      - export REACT_APP_BRAND_SERVICE_URL=${BRAND_SERVICE_URL}
+      - echo REACT_APP_BRAND_SERVICE_URL is ${REACT_APP_BRAND_SERVICE_URL}
+      - npm run build
+
+  post_build:
+    commands:
+      # Copy build folder to S3 bucket
+      - echo Token Vault $VAULT_TOKEN
+      - echo Vault URL $VAULT_URL
+      - echo S3 Bucket is ${S3_BUCKET}
+      - aws s3 sync build/ s3://${S3_BUCKET} --exclude ".git*" --acl public-read --cache-control max-age=604800
+      - aws s3 cp build/index.html s3://${S3_BUCKET} --acl public-read --cache-control max-age=0
+      - aws cloudfront  create-invalidation --distribution-id ${CF_ID} --paths "/*"
+      - echo Build completed on `date`
+      - curl -s -X POST -d "{\"env\":\"$AMBIENTES\",\"service\":\"$SERVICE_NAME\",\"owner\":\"$owner\",\"message\":\"DeployStart-$CODEBUILD_SOURCE_VERSION\"}" https://hermes.fintechpeople.ninja/gchatmsg
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: yes
+  base-directory: 'build*'
+cache:
+  paths:
+    - '$CODEBUILD_SRC_DIR/node_modules/**/*'

@@ -64,14 +64,13 @@ class MockList extends React.Component {
         
         axios.post("http://localhost:8000/mocks", this.state.newMock)
         .then(_ => {
-            setTimeout(() => {
-                this.setState({
-                    confirmLoading: false,
-                    newMock: emptyMock,
-                    saveStatus: "success"
-                });
-                this.props.addMock(this.state.newMock)
-            }, 1000);
+            this.props.refreshMockList()
+            
+            this.setState({
+                confirmLoading: false,
+                newMock: emptyMock,
+                saveStatus: "success"
+            });
             
         }).catch(err => {
             console.error(err)
@@ -213,8 +212,8 @@ class MockList extends React.Component {
                     onCancel={this.handleCancel}
                     footer={[
                         <Button key="back" onClick={this.handleCancel}>Close</Button>,
-                        <Button key="submit" type="primary" onClick={this.createMock} l
-                                oading={this.state.confirmLoading}>
+                        <Button key="submit" type="primary" onClick={this.createMock} 
+                                loading={this.state.confirmLoading}>
                           Create
                         </Button>,
                       ]}

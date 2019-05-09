@@ -30,7 +30,8 @@ class BodyContent extends React.Component{
               return (<MockList 
                   list={this.props.mockList} 
                   showMock={this.showMock} 
-                  deleteMock={this.props.deleteMock} />)
+                  deleteMock={this.props.deleteMock} 
+                  refreshMockList={this.props.refreshMockList}/>)
 
             case "endpoints":
               return (<EndpointList 
