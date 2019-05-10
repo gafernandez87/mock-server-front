@@ -89,17 +89,19 @@ class EndpointsList extends React.Component {
         this.setState({bodyClass})
     }
 
-    changeHeader = (index, input, isKey) => {
+    changeHeader = (index, input, isKey, value) => {
         const newHeaders = {...this.state.currentEndpoint.newHeaders}
-        console.log("newHeaders",newHeaders[index][input])
+        console.log("newHeaders", newHeaders)
+        console.log("newHeaders[index]", newHeaders[index])
+        console.log("newHeaders[index][input]", newHeaders[index][input])
+
+        newHeaders[index][input] = value
+        //this.setState({newHeaders})
     }
 
     handleChange = (e, model) => {
         let currentEndpoint = { ...this.state.currentEndpoint };
         if(model) {
-            if(model === "headers"){
-                this.changeHeader(e.target.value)
-            }
             currentEndpoint[model][e.target.name] = e.target.value;
         } else {
             if(e.target.name === "body"){
@@ -154,14 +156,17 @@ class EndpointsList extends React.Component {
 
     getNewHeaders = (headers) => {
         if(headers){
-            return Object.keys(headers).map((key, i) => {
+            const newHeader = Object.keys(headers).map((key, i) => {
                 const input = `input_${i}`
                 let header = {}
                 let subObject = {}
+                //Al armar el objeto, la "key" (subObject[key]) no queda como String y despues se rompe todo
                 subObject[key] = headers[key]
                 header[input] = subObject
                 return header
             })
+            console.log(newHeader)
+            return newHeader
         }else{
            return []
         }
@@ -176,9 +181,7 @@ class EndpointsList extends React.Component {
     }
 
     getTitle = () => {
-        return (
-            `Mock: ${this.props.getMockName()}`
-        )
+        return (`Mock: ${this.props.getMockName()}`)
     }
 
     render(){

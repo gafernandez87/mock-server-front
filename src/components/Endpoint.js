@@ -56,22 +56,22 @@ class Endpoint extends React.Component{
                         const inputNum = Object.keys(header)[0] //Ej: Input_0
                         const key = Object.keys(header[inputNum])[0]
                         const value = header[inputNum][key]
-                        console.log("header", header)
-                        console.log("inputNum", inputNum)
-                        console.log("key", key)
-                        console.log("value", value)
+                        // console.log("header", header)
+                        // console.log("inputNum", inputNum)
+                        // console.log("key", key)
+                        // console.log("value", value)
 
                         return(
                             <div key={index}>
                                 <Input
                                     style={{width: 200, marginRight: 20}}
                                     key={`${inputNum}_key`} value={key} name={key}
-                                    onChange={(e) => this.props.changeHeader(e, 'headers')}
+                                    onChange={(e) => this.props.changeHeader(index, inputNum, true, value)}
                                 />
                                 <Input
                                     style={{width: 200}}
                                     key={`${inputNum}_value`} value={value} name={value}
-                                    onChange={(e) => this.props.changeHeader(e, 'headers')}
+                                    onChange={(e) => this.props.changeHeader(index, inputNum, false, e.target.value)}
                                 />
                                 <br />
 
