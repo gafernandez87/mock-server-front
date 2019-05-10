@@ -1,11 +1,10 @@
 import React from 'react';
 import axios from 'axios';
-import { Row, Col, Menu, Icon } from 'antd';
+import { Row, Col, PageHeader, Input, Icon } from 'antd';
 import Endpoint from './Endpoint'
 import EndpointCard from './EndpointCard'
+import Constants from '../config/Constants'
 
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
 const emptyEndpoint = {
     name: "new endpoint",
     httpRequest: {
@@ -39,7 +38,7 @@ class EndpointsList extends React.Component {
         updatedEndpoint.httpResponse.body = JSON.parse(this.state.currentEndpoint.stringBody)
         const mockId = this.props.getMockId()
 
-        const url = this.state.newEndpoint ? `http://localhost:8000/mocks/${mockId}/endpoints` : `http://localhost:8000/mocks/${mockId}/endpoints/${updatedEndpoint._id}`;
+        const url = this.state.newEndpoint ? `${Constants.API_URL}/mocks/${mockId}/endpoints` : `${Constants.API_URL}/mocks/${mockId}/endpoints/${updatedEndpoint._id}`;
         const method = this.state.newEndpoint ? "post" : "put";
 
         (axios[method])(url, updatedEndpoint)
@@ -65,7 +64,7 @@ class EndpointsList extends React.Component {
         const mockId = this.props.getMockId()
         const endpointId = this.state.currentEndpoint._id
 
-        axios.delete(`http://localhost:8000/mocks/${mockId}/endpoints/${endpointId}`)
+        axios.delete(`${Constants.API_URL}/mocks/${mockId}/endpoints/${endpointId}`)
         .then(data => {
             console.log("Delete result", data)
             this.setState({currentEndpoint: emptyEndpoint})
@@ -90,9 +89,17 @@ class EndpointsList extends React.Component {
         this.setState({bodyClass})
     }
 
+    changeHeader = (index, input, isKey) => {
+        const newHeaders = {...this.state.currentEndpoint.newHeaders}
+        console.log("newHeaders",newHeaders[index][input])
+    }
+
     handleChange = (e, model) => {
         let currentEndpoint = { ...this.state.currentEndpoint };
         if(model) {
+            if(model === "headers"){
+                this.changeHeader(e.target.value)
+            }
             currentEndpoint[model][e.target.name] = e.target.value;
         } else {
             if(e.target.name === "body"){
@@ -115,6 +122,7 @@ class EndpointsList extends React.Component {
             closeAlert={this.closeAlert}
             bodyClass={this.state.bodyClass}
             isNewEndpoint={this.state.newEndpoint}
+            changeHeader={this.changeHeader}
         />)
     }
 
@@ -137,10 +145,27 @@ class EndpointsList extends React.Component {
                 ...endpoint,
                 httpRequest: { ...endpoint.httpRequest },
                 httpResponse: { ...endpoint.httpResponse },
-                stringBody: JSON.stringify(endpoint.httpResponse.body, null, 2)
+                stringBody: JSON.stringify(endpoint.httpResponse.body, null, 2),
+                newHeaders: this.getNewHeaders(endpoint.httpResponse.headers)
             },
             newEndpoint: false
         })
+    }
+
+    getNewHeaders = (headers) => {
+        if(headers){
+            return Object.keys(headers).map((key, i) => {
+                const input = `input_${i}`
+                let header = {}
+                let subObject = {}
+                subObject[key] = headers[key]
+                header[input] = subObject
+                return header
+            })
+        }else{
+           return []
+        }
+        
     }
 
     newEndpoint = () => {
@@ -150,28 +175,22 @@ class EndpointsList extends React.Component {
         })
     }
 
+    getTitle = () => {
+        return (
+            `Mock: ${this.props.getMockName()}`
+        )
+    }
+
     render(){
         return (
             <div>
                 <Row>
                     <Col>
-                        <Menu mode="horizontal">
-                            <Menu.Item key="newEndpoint" onClick={this.newEndpoint}>
-                                <Icon type="plus" />New Endpoint
-                            </Menu.Item>
-                            <SubMenu title={<span className="submenu-title-wrapper">Endpoints</span>}>
-                                <MenuItemGroup  title="Endpoints">
-                                {this.props.list.map(endpoint => {
-                                    return (
-                                        <Menu.Item key={endpoint._id} onClick={() => this.selectEndpoint(endpoint)}>
-                                            {endpoint.httpRequest.method} {endpoint.httpRequest.path}
-                                        </Menu.Item>
-                                    )
-                                })}
-                                </MenuItemGroup>
-                                
-                            </SubMenu>
-                        </Menu>
+                        <PageHeader
+                            onBack={() => this.props.changePage("mocks")}
+                            title={this.getTitle()}
+                        >
+                        </PageHeader>
                     </Col>
                 </Row>
                 <Row style={{marginTop: 10}}>

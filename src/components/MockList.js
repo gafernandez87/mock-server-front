@@ -2,6 +2,8 @@ import React from 'react';
 import { Row, Col, Table, Menu, Icon, Modal, Form, Input, Select, Button, Alert } from 'antd';
 import Highlighter from 'react-highlight-words';
 import axios from 'axios';
+import Constants from '../config/Constants'
+import { object } from 'prop-types';
 
 const {Option} = Select
 const emptyMock = {
@@ -62,7 +64,7 @@ class MockList extends React.Component {
     createMock = () => {
         this.setState({ confirmLoading: true});
         
-        axios.post("http://localhost:8000/mocks", this.state.newMock)
+        axios.post(`${Constants.API_URL}/mocks`, this.state.newMock)
         .then(_ => {
             this.props.refreshMockList()
             
@@ -165,19 +167,26 @@ class MockList extends React.Component {
 
     generateTableStructure(structure){
         return structure.map(column => {
-            return {
-                title: column.title,
-                dataIndex: column.name,
-                key: column.name,
-                width: column.width,
+            let obj = {}
 
+            if(column.name != "actions") {
+                obj = {
+                    ...this.getColumnSearchProps(column.name)
+                }
             }
+
+            obj.title = column.title
+            obj.dataIndex = column.name
+            obj.key = column.name
+            obj.width = column.width
+            
+            return obj
         })
     }
 
-    generateActions = (mockId) => {
+    generateActions = (mockId, name) => {
         return (<div>
-            <a href="javascript:;" onClick={() => this.props.showMock(mockId)}>Show</a> | <a href="javascript:;" onClick={() => this.showDeleteConfirm(mockId, this.props.deleteMock)}>Delete</a>
+            <a href="javascript:;" onClick={() => this.props.showMock(mockId, name)}>Show</a> | <a href="javascript:;" onClick={() => this.showDeleteConfirm(mockId, this.props.deleteMock)}>Delete</a>
             </div>)
     }
 
@@ -191,7 +200,7 @@ class MockList extends React.Component {
                 brand: mock.brand,
                 product: mock.product,
                 creation_date: mock.creation_date,
-                actions: this.generateActions(mock._id)
+                actions: this.generateActions(mock._id, mock.name)
             }
         })
         const columns = this.generateTableStructure([

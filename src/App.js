@@ -4,6 +4,7 @@ import "antd/dist/antd.css";
 import axios from 'axios';
 import BodyContent from './components/BodyContent'
 import { Layout, Menu } from 'antd';
+import Constants from './config/Constants'
 
 const { Header, Content } = Layout;
 
@@ -16,7 +17,7 @@ class App extends React.Component {
   };
 
   componentDidMount = () => {
-    axios.get(`http://localhost:8000/mocks`)
+    axios.get(`${Constants.API_URL}/mocks`)
     .then(response => {
         this.setState({mockList: response.data})
     }).catch(err => {
@@ -31,7 +32,7 @@ class App extends React.Component {
   }
 
   showAllEndpoints = () => {
-    axios.get(`http://localhost:8000/endpoints`)
+    axios.get(`${Constants.API_URL}/endpoints`)
     .then(response => {
       this.setState({
         endpointList: response.data,
@@ -50,10 +51,10 @@ class App extends React.Component {
   }
 
   deleteMock = (mockId) => {
-    axios.delete(`http://localhost:8000/mocks/${mockId}`)
+    axios.delete(`${Constants.API_URL}/mocks/${mockId}`)
     .then(data => {
         console.log("Delete result", data)
-        return axios.get(`http://localhost:8000/mocks`)
+        return axios.get(`${Constants.API_URL}/mocks`)
     })
     .then(result => {
       this.setState({mockList: result.data})
@@ -66,7 +67,7 @@ class App extends React.Component {
   }
 
   refreshEndpointList = (mockId) => {
-    axios.get(`http://localhost:8000/mocks/${mockId}/endpoints`)
+    axios.get(`${Constants.API_URL}/mocks/${mockId}/endpoints`)
     .then(response => {
       this.setState({endpointList: response.data})
     }).catch(err => {
@@ -76,7 +77,7 @@ class App extends React.Component {
   }
 
   refreshMockList = () => {
-    axios.get(`http://localhost:8000/mocks`)
+    axios.get(`${Constants.API_URL}/mocks`)
     .then(response => {
       this.setState({mockList: response.data})
     }).catch(err => {
@@ -96,8 +97,7 @@ class App extends React.Component {
             defaultSelectedKeys={['1']}
             style={{ lineHeight: '64px' }}
           >
-            <Menu.Item onClick={() => {this.setState({currentPage: "mocks"})}} key="1">Mocks</Menu.Item>
-            <Menu.Item onClick={this.showAllEndpoints} key="2">Endpoints</Menu.Item>
+            <Menu.Item onClick={() => {this.setState({currentPage: "mocks"})}} key="1">Home</Menu.Item>
           </Menu>
         </Header>
         <Layout>
