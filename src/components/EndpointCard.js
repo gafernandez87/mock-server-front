@@ -10,6 +10,11 @@ class EndpointCard extends React.Component{
             case "DELETE":
                 return "red"
             case "GET":
+                return "green"
+            case "PATCH":
+                return "orange"
+            case "PUT":
+                return "purple"
             default: 
                 return "green"
         }
@@ -36,10 +41,10 @@ class EndpointCard extends React.Component{
                         color={this.getColorByMethod(endpoint.httpRequest.method)}>
                         {endpoint.httpRequest.method}
                     </Tag>
-                    {endpoint.httpRequest.path}
+                    <span style={{fontWeight: 600}}>{endpoint.httpRequest.path}</span>
                 </div>
-                <p>{endpoint.httpResponse.statusCode}</p>
-                <pre style={{backgroundColor: "#fafafa", border: "1px solid black"}}>
+                <p style={{fontWeight: 600}}>{endpoint.httpResponse.statusCode}</p>
+                <pre style={{backgroundColor: "#ffffff", border: "1px dashed #585858", padding: "5px"}}>
                     {JSON.stringify(endpoint.httpResponse.body, null, 2)}
                 </pre>
             </Card>

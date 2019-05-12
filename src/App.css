@@ -1,3 +1,15 @@
+body {
+  background-color: #f0f2f5 !important;
+}
+
+.ant-layout-content {
+  border: 1px solid #b9b9b9;
+}
+
+.ant-layout-header {
+  padding: 0 20px !important;
+}
+
 .App {
   text-align: center;
 }
@@ -52,4 +64,68 @@
 
 .error p{
   color: red;
+}
+
+.ant-card {
+  margin: 8px !important;
+}
+
+.ant-menu {
+      display: flex;
+}
+
+.ant-menu-item {
+  font-weight: 600;
+  background: #ececec
+}
+
+.ant-alert-banner {
+  margin-bottom: 15px;
+}
+
+.ant-modal-header {
+  background: #f7f7f7 !important;
+}
+
+.ant-card-bordered {
+    border: 1px solid #ababab !important;
+    background: #fbfbfb !important;
+}
+
+.ant-card-head {
+  background: #f7f7f7 !important;
+}
+
+.ant-card.selected {
+  background: #cee1f1 !important;
+}
+
+.ant-form-item {
+  margin-bottom: 15px !important;
+}
+
+.ant-tag-green {
+  font-weight: bold;
+}
+
+.ant-page-header-content-view{
+  display: inline-block;
+}
+
+.ant-page-header {
+  display: flex;
+  align-items: baseline;
+  padding: 0px 5px !important;
+}
+
+.ant-page-header-content-view {
+  margin-left: auto;
+}
+
+.ant-steps {
+  padding-left: 7px !important;
+}
+
+.blured {
+  filter: grayscale(0.5) blur(3px);
 }

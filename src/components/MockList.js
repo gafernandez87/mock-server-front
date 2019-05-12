@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Table, Menu, Icon, Modal, Form, Input, Select, Button, Alert } from 'antd';
+import { Row, Col, Table, Menu, Icon, Modal, Form, Input, Select, Button, Alert, Popover, Timeline } from 'antd';
 import Highlighter from 'react-highlight-words';
 import axios from 'axios';
 import Constants from '../config/Constants'
@@ -25,6 +25,15 @@ const formItemLayout = {
       sm: { span: 16 }
     }
 };
+
+const content = (
+  <Timeline>
+    <Timeline.Item>Create a new MOCK group or edit one.</Timeline.Item>
+    <Timeline.Item>Add or edit endpoints to your group.</Timeline.Item>
+    <Timeline.Item>Define the endpoint path, the http response status, http verb,<br/> response body, and the response headers.</Timeline.Item>
+    <Timeline.Item color="green">Use them to mock up your project.</Timeline.Item>
+  </Timeline>
+);
 
 const confirm = Modal.confirm;
 
@@ -215,7 +224,7 @@ class MockList extends React.Component {
         return (
             <div>
                 <Modal
-                    title="NEW MOCK"
+                    title="NEW MOCK GROUP"
                     visible={this.state.modalVisible}
                     confirmLoading={this.stateconfirmLoading}
                     onCancel={this.handleCancel}
@@ -277,7 +286,12 @@ class MockList extends React.Component {
                     <Col>
                         <Menu mode="horizontal">
                             <Menu.Item key="newEndpoint" onClick={this.showModal}>
-                                <Icon type="plus" />NEW MOCK
+                                <Icon type="plus" />NEW MOCK GROUP
+                            </Menu.Item>
+                            <Menu.Item key="help" style={{marginLeft: "auto", background: "none"}}>
+                                <Popover content={content} title="Route" placement="leftTop" trigger="hover">
+                                    <Icon type="question" />
+                                </Popover>
                             </Menu.Item>
                         </Menu>
                     </Col>

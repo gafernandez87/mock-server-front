@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Row, Col, PageHeader, Input, Icon } from 'antd';
+import { Row, Col, PageHeader, Input, Icon, Button, Steps } from 'antd';
 import Endpoint from './Endpoint'
 import EndpointCard from './EndpointCard'
 import Constants from '../config/Constants'
@@ -16,6 +16,8 @@ const emptyEndpoint = {
     },
     saveStatus: ""
 }
+
+const Step = Steps.Step;
 
 class EndpointsList extends React.Component {
 
@@ -181,10 +183,12 @@ class EndpointsList extends React.Component {
     }
 
     getTitle = () => {
-        return (`Mock: ${this.props.getMockName()}`)
+        return (`Mock GROUP: ${this.props.getMockName()}`)
     }
 
     render(){
+        const isNewEndpoint = this.state.newEndpoint
+
         return (
             <div>
                 <Row>
@@ -193,12 +197,23 @@ class EndpointsList extends React.Component {
                             onBack={() => this.props.changePage("mocks")}
                             title={this.getTitle()}
                         >
+                            <div>
+                                    <Button type="dashed" onClick={this.newEndpoint}><Icon type="plus" />Add Enpoint</Button>
+                            </div>
                         </PageHeader>
                     </Col>
                 </Row>
                 <Row style={{marginTop: 10}}>
                     <Col span={8}>
-                        {this.renderEndpointList()}
+                        <Steps current={1}>
+                            <Step status="finish" title="Endpoint list" icon={<Icon type="ordered-list" />} />
+                        </Steps>
+                        {isNewEndpoint && <div className="blured">
+                            {this.renderEndpointList()}
+                        </div>}
+                        {!isNewEndpoint && <div>
+                            {this.renderEndpointList()}
+                        </div>}
                     </Col>
                     <Col span={16}>
                         {this.renderEndpoint()}

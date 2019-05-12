@@ -1,9 +1,9 @@
 import React from 'react'
-import { Card,  Form, Input, Select, Button, Affix, Alert, Modal, Icon } from 'antd';
+import { Card,  Form, Input, Select, Button, Affix, Alert, Modal, Icon, Steps } from 'antd';
 
 const { Option } = Select;
 const confirm = Modal.confirm;
-
+const Step = Steps.Step;
 
 let id = 0;
 
@@ -100,6 +100,14 @@ class Endpoint extends React.Component{
         return (
             <Affix offsetTop={10}>
                 {this.showAlert()}
+                {this.props.isNewEndpoint && 
+                    <Steps current={1}>
+                        <Step status="finish" title="New endpoint data..." icon={<Icon type="plus-square" />} />
+                    </Steps> }
+                {!this.props.isNewEndpoint && 
+                    <Steps current={1}>
+                        <Step status="finish" title={this.props.data.name} icon={<Icon type="right" />} />
+                    </Steps> }    
                 <Card>
                     <Form {...formItemLayout}>
                         <h2>Request</h2>
@@ -124,6 +132,7 @@ class Endpoint extends React.Component{
                                 <Option value="GET">GET</Option>
                                 <Option value="POST">POST</Option>
                                 <Option value="PUT">PUT</Option>
+                                <Option value="PATCH">PATCH</Option>
                                 <Option value="DELETE">DELETE</Option>
                             </Select>
                             <Input 
