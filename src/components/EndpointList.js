@@ -14,7 +14,8 @@ const emptyEndpoint = {
     httpResponse: {
         statusCode: 200
     },
-    saveStatus: ""
+    saveStatus: "",
+    errorMessage: ""
 }
 
 const Step = Steps.Step;
@@ -37,6 +38,14 @@ class EndpointsList extends React.Component {
 
     saveEndpoint = () => {
         const updatedEndpoint = { ...this.state.currentEndpoint}
+
+        if ( updatedEndpoint.httpRequest.path.substring(0, 1) != "/" ) {
+            this.setState({
+                saveStatus: "error",
+                errorMessage: 'The first character of the path must be "/"'
+            })
+            return updatedEndpoint;
+        }
         updatedEndpoint.httpResponse.body = JSON.parse(this.state.currentEndpoint.stringBody)
         const mockId = this.props.getMockId()
 
@@ -123,6 +132,7 @@ class EndpointsList extends React.Component {
             deleteEndpoint={this.deleteEndpoint}
             handleChange={this.handleChange}
             saveStatus={this.state.saveStatus}
+            errorMessage={this.state.errorMessage}
             closeAlert={this.closeAlert}
             bodyClass={this.state.bodyClass}
             isNewEndpoint={this.state.newEndpoint}
@@ -138,6 +148,7 @@ class EndpointsList extends React.Component {
                     key={index} 
                     endpoint={endpoint} 
                     index={index} 
+                    prefix={this.props.getMockPrefix()}
                     selectEndpoint={this.selectEndpoint} />
             )
         })
@@ -186,6 +197,10 @@ class EndpointsList extends React.Component {
         return (`Mock GROUP: ${this.props.getMockName()}`)
     }
 
+    getSubTitle = () => {
+        return (`Path prefix: ${this.props.getMockPrefix()}`)
+    }
+
     render(){
         const isNewEndpoint = this.state.newEndpoint
 
@@ -196,6 +211,7 @@ class EndpointsList extends React.Component {
                         <PageHeader
                             onBack={() => this.props.changePage("mocks")}
                             title={this.getTitle()}
+                            subTitle={this.getSubTitle()}
                         >
                             <div>
                                     <Button type="dashed" onClick={this.newEndpoint}><Icon type="plus" />Add Enpoint</Button>

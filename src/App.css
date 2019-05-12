@@ -97,11 +97,11 @@ body {
 }
 
 .ant-card.selected {
-  background: #cee1f1 !important;
+  background: #e8e8e8 !important;
 }
 
 .ant-form-item {
-  margin-bottom: 15px !important;
+  margin-bottom: 6px !important;
 }
 
 .ant-tag-green {

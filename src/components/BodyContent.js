@@ -6,10 +6,10 @@ import Constants from '../config/Constants'
 
 class BodyContent extends React.Component{
 
-  showMock = (mockId, name) => {
+  showMock = (mockId, name, prefix) => {
       axios.get(`${Constants.API_URL}/mocks/${mockId}/endpoints`)
       .then(response => {
-        this.setState({mock_id: mockId, mock_name: name})
+        this.setState({mock_id: mockId, mock_name: name, mock_prefix: prefix})
         this.props.updateEndpointList(response.data)
         this.props.changePage("endpoints")
       })
@@ -28,6 +28,10 @@ class BodyContent extends React.Component{
     return this.state.mock_name
   }
 
+  getMockPrefix = () => {
+    return this.state.mock_prefix
+  }
+
   renderBody = (page) => {
       switch(page){
           case "mocks":
@@ -43,6 +47,7 @@ class BodyContent extends React.Component{
                 refreshEndpointList={this.props.refreshEndpointList}
                 getMockId={this.getMockId}
                 getMockName={this.getMockName}
+                getMockPrefix={this.getMockPrefix}
                 changePage={this.props.changePage} />)
           default:
             return (<div>You should not be here... RUN!</div>)

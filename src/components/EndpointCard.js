@@ -21,7 +21,7 @@ class EndpointCard extends React.Component{
     }
 
     render(){
-        const {index, endpoint, selectedId} = this.props
+        const {index, endpoint, selectedId, prefix} = this.props
 
         let cardClasses = "endpointCard"
         if(selectedId === this.props.endpoint._id){
@@ -47,6 +47,7 @@ class EndpointCard extends React.Component{
                 <pre style={{backgroundColor: "#ffffff", border: "1px dashed #585858", padding: "5px"}}>
                     {JSON.stringify(endpoint.httpResponse.body, null, 2)}
                 </pre>
+                <span>Published path: </span><Tag color="volcano">{prefix}{endpoint.httpRequest.path}</Tag>
             </Card>
         )
     }

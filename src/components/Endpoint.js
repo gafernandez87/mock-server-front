@@ -19,6 +19,10 @@ class Endpoint extends React.Component{
     }
     
     showAlert = () => {
+        var message="An error occurred while saving the endpoint. Please try again";
+        if ( this.props.errorMessage != "" ) {
+            message = this.props.errorMessage;
+        } 
         switch(this.props.saveStatus){
             case "success":
                 return <Alert 
@@ -27,7 +31,7 @@ class Endpoint extends React.Component{
                         onClose={this.props.closeAlert}/>
             case "error":
                 return <Alert 
-                    message="An error occurred while saving the endpoint. Please try again" 
+                    message={message} 
                     type="error" banner closable
                     onClose={this.props.closeAlert}/>
             default:
