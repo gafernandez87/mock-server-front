@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Table, Menu, Icon, Modal, Form, Input, Select, Button, Alert } from 'antd';
+import { Row, Col, Table, Menu, Icon, Modal, Form, Input, Select, Button, Alert, Popover, Timeline } from 'antd';
 import Highlighter from 'react-highlight-words';
 import axios from 'axios';
 import Constants from '../config/Constants'
@@ -10,6 +10,7 @@ const emptyMock = {
     name: "New mock",
     author: "",
     description: "",
+    prefix: "/mock",
     brand: "",
     product: ""
 }
@@ -25,6 +26,15 @@ const formItemLayout = {
       sm: { span: 16 }
     }
 };
+
+const content = (
+  <Timeline>
+    <Timeline.Item>Create a new MOCK group or edit one.</Timeline.Item>
+    <Timeline.Item>Add or edit endpoints to your group.</Timeline.Item>
+    <Timeline.Item>Define the endpoint path, the http response status, http verb,<br/> response body, and the response headers.</Timeline.Item>
+    <Timeline.Item color="green">Use them to mock up your project.</Timeline.Item>
+  </Timeline>
+);
 
 const confirm = Modal.confirm;
 
@@ -184,9 +194,9 @@ class MockList extends React.Component {
         })
     }
 
-    generateActions = (mockId, name) => {
+    generateActions = (mockId, name, prefix) => {
         return (<div>
-            <a href="javascript:;" onClick={() => this.props.showMock(mockId, name)}>Show</a> | <a href="javascript:;" onClick={() => this.showDeleteConfirm(mockId, this.props.deleteMock)}>Delete</a>
+            <a href="javascript:;" onClick={() => this.props.showMock(mockId, name, prefix)}>Show</a> | <a href="javascript:;" onClick={() => this.showDeleteConfirm(mockId, this.props.deleteMock)}>Delete</a>
             </div>)
     }
 
@@ -196,16 +206,18 @@ class MockList extends React.Component {
                 key: index,
                 name: mock.name,
                 description: mock.description,
+                prefix: mock.prefix,
                 author: mock.author,
                 brand: mock.brand,
                 product: mock.product,
                 creation_date: mock.creation_date,
-                actions: this.generateActions(mock._id, mock.name)
+                actions: this.generateActions(mock._id, mock.name, mock.prefix)
             }
         })
         const columns = this.generateTableStructure([
             {title: "Name", name: "name", width:"15%"},
-            {title: "Description", name: "description", width:"25%"},
+            {title: "Description", name: "description", width:"20%"},
+            {title: "Prefix", name: "prefix", width:"5%"},
             {title: "Author", name: "author", width:"15%"},
             {title: "Brand", name: "brand", width:"10%"},
             {title: "Product", name: "product", width:"5%"},
@@ -215,7 +227,7 @@ class MockList extends React.Component {
         return (
             <div>
                 <Modal
-                    title="NEW MOCK"
+                    title="NEW MOCK GROUP"
                     visible={this.state.modalVisible}
                     confirmLoading={this.stateconfirmLoading}
                     onCancel={this.handleCancel}
@@ -250,6 +262,16 @@ class MockList extends React.Component {
                                     onChange={(e) => this.handleChange(e)}
                                 />
                             </Form.Item>
+                            <Form.Item label="Prefix">
+                                <Popover content="all the endpoints in the group 
+                                start with this prefix path. Example: /mock" title="Prefix" placement="leftTop" trigger="hover">
+                                    <Input 
+                                    id="prefix" name="prefix"
+                                    value={this.state.newMock.prefix}
+                                    onChange={(e) => this.handleChange(e)}
+                                />
+                                </Popover>
+                            </Form.Item>
                             <Form.Item label="Brand">
                                 <Select 
                                     onChange={(e) => this.handleChange({ target: { name: "brand", value: e } })}
@@ -277,7 +299,12 @@ class MockList extends React.Component {
                     <Col>
                         <Menu mode="horizontal">
                             <Menu.Item key="newEndpoint" onClick={this.showModal}>
-                                <Icon type="plus" />NEW MOCK
+                                <Icon type="plus" />NEW MOCK GROUP
+                            </Menu.Item>
+                            <Menu.Item key="help" style={{marginLeft: "auto", background: "none"}}>
+                                <Popover content={content} title="Route" placement="leftTop" trigger="hover">
+                                    <Icon type="question" />
+                                </Popover>
                             </Menu.Item>
                         </Menu>
                     </Col>

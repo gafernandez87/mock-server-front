@@ -1,8 +1,9 @@
 import React from 'react'
-import { Card,  Form, Input, Select, Button, Affix, Alert, Modal, Icon } from 'antd';
+import { Card,  Form, Input, Select, Button, Affix, Alert, Modal, Icon, Steps } from 'antd';
 
 const { Option } = Select;
 const confirm = Modal.confirm;
+const Step = Steps.Step;
 
 class Endpoint extends React.Component{
 
@@ -15,6 +16,10 @@ class Endpoint extends React.Component{
     }
     
     showAlert = () => {
+        var message="An error occurred while saving the endpoint. Please try again";
+        if ( this.props.errorMessage != "" ) {
+            message = this.props.errorMessage;
+        } 
         switch(this.props.saveStatus){
             case "success":
                 return <Alert 
@@ -23,7 +28,7 @@ class Endpoint extends React.Component{
                         onClose={this.props.closeAlert}/>
             case "error":
                 return <Alert 
-                    message="An error occurred while saving the endpoint. Please try again" 
+                    message={message} 
                     type="error" banner closable
                     onClose={this.props.closeAlert}/>
             default:
@@ -93,6 +98,14 @@ class Endpoint extends React.Component{
         return (
             <Affix offsetTop={10}>
                 {this.showAlert()}
+                {this.props.isNewEndpoint && 
+                    <Steps current={1}>
+                        <Step status="finish" title="New endpoint data..." icon={<Icon type="plus-square" />} />
+                    </Steps> }
+                {!this.props.isNewEndpoint && 
+                    <Steps current={1}>
+                        <Step status="finish" title={this.props.data.name} icon={<Icon type="right" />} />
+                    </Steps> }    
                 <Card>
                     <Form {...formItemLayout}>
                         <h2>Request</h2>
@@ -117,6 +130,7 @@ class Endpoint extends React.Component{
                                 <Option value="GET">GET</Option>
                                 <Option value="POST">POST</Option>
                                 <Option value="PUT">PUT</Option>
+                                <Option value="PATCH">PATCH</Option>
                                 <Option value="DELETE">DELETE</Option>
                             </Select>
                             <Input 

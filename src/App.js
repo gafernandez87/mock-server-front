@@ -102,7 +102,7 @@ class App extends React.Component {
         </Header>
         <Layout>
           
-          <Layout style={{ padding: '0 24px 24px' }}>
+          <Layout style={{ padding: '20px' }}>
             <Content style={{
               background: '#fff', padding: 24, margin: 0, minHeight: 280,
             }}
