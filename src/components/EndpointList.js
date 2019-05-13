@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Row, Col, PageHeader, Input, Icon } from 'antd';
+import { Row, Col, PageHeader } from 'antd';
 import Endpoint from './Endpoint'
 import EndpointCard from './EndpointCard'
 import Constants from '../config/Constants'
@@ -33,9 +33,80 @@ class EndpointsList extends React.Component {
         this.setState({saveStatus: ""})
     }
 
+    addNewHeader = () => {
+        let currentEndpoint = {...this.state.currentEndpoint}
+        let newHeaders = [...currentEndpoint.newHeaders]
+        
+        const l = Object.keys(newHeaders).length
+        const input = `input_${l}`
+        let subObject = {} 
+
+        subObject[input] = {"":""}
+        newHeaders[l] = subObject
+
+        currentEndpoint.newHeaders = newHeaders
+        this.setState({currentEndpoint})
+    }
+
+    deleteHeader = (index) => {
+        let currentEndpoint = {...this.state.currentEndpoint}
+        let newHeaders = [...currentEndpoint.newHeaders]
+        delete newHeaders[index]
+        currentEndpoint.newHeaders = newHeaders
+        this.setState({currentEndpoint})
+    }
+    
+    getNewHeaders = (headers) => {
+        if(headers){
+            const newHeader = Object.keys(headers).map((key, i) => {
+                const input = `input_${i}`
+                let header = {}
+                let subObject = {}
+
+                subObject[key] = headers[key]
+                header[input] = subObject
+                return header
+            })
+            return newHeader
+        }else{
+           return []
+        }
+    }
+
+    changeHeader = (index, input, isKey, headerValue, headerKey, newHeaderKey) => {
+        const newHeaders = {...this.state.currentEndpoint.newHeaders}
+        
+        if(!isKey){
+            newHeaders[index][input][headerKey] = headerValue
+        }else{
+            delete newHeaders[index][input][headerKey]
+            newHeaders[index][input][newHeaderKey] = headerValue
+        }
+
+        this.setState({newHeaders})
+    }
+
+    convertToHeader = () => {
+        let newHeaders = {...this.state.currentEndpoint.newHeaders}
+        let l = Object.keys(newHeaders).length
+        console.log(newHeaders)
+        let result = {}
+        for(let i = 0; i < l; i++){
+            try{
+                const input = Object.keys(newHeaders[i])[0]
+                result = Object.assign(newHeaders[i][input], result)
+            }catch(e){
+                //do nothing
+            }
+        }
+        return result
+    }
+
     saveEndpoint = () => {
         const updatedEndpoint = { ...this.state.currentEndpoint}
         updatedEndpoint.httpResponse.body = JSON.parse(this.state.currentEndpoint.stringBody)
+        updatedEndpoint.httpResponse.headers = this.convertToHeader()
+
         const mockId = this.props.getMockId()
 
         const url = this.state.newEndpoint ? `${Constants.API_URL}/mocks/${mockId}/endpoints` : `${Constants.API_URL}/mocks/${mockId}/endpoints/${updatedEndpoint._id}`;
@@ -89,16 +160,6 @@ class EndpointsList extends React.Component {
         this.setState({bodyClass})
     }
 
-    changeHeader = (index, input, isKey, value) => {
-        const newHeaders = {...this.state.currentEndpoint.newHeaders}
-        console.log("newHeaders", newHeaders)
-        console.log("newHeaders[index]", newHeaders[index])
-        console.log("newHeaders[index][input]", newHeaders[index][input])
-
-        newHeaders[index][input] = value
-        //this.setState({newHeaders})
-    }
-
     handleChange = (e, model) => {
         let currentEndpoint = { ...this.state.currentEndpoint };
         if(model) {
@@ -124,7 +185,9 @@ class EndpointsList extends React.Component {
             closeAlert={this.closeAlert}
             bodyClass={this.state.bodyClass}
             isNewEndpoint={this.state.newEndpoint}
+            addNewHeader={this.addNewHeader}
             changeHeader={this.changeHeader}
+            deleteHeader={this.deleteHeader}
         />)
     }
 
@@ -152,25 +215,6 @@ class EndpointsList extends React.Component {
             },
             newEndpoint: false
         })
-    }
-
-    getNewHeaders = (headers) => {
-        if(headers){
-            const newHeader = Object.keys(headers).map((key, i) => {
-                const input = `input_${i}`
-                let header = {}
-                let subObject = {}
-                //Al armar el objeto, la "key" (subObject[key]) no queda como String y despues se rompe todo
-                subObject[key] = headers[key]
-                header[input] = subObject
-                return header
-            })
-            console.log(newHeader)
-            return newHeader
-        }else{
-           return []
-        }
-        
     }
 
     newEndpoint = () => {

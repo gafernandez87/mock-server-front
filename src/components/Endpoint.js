@@ -4,10 +4,6 @@ import { Card,  Form, Input, Select, Button, Affix, Alert, Modal, Icon } from 'a
 const { Option } = Select;
 const confirm = Modal.confirm;
 
-
-let id = 0;
-
-
 class Endpoint extends React.Component{
 
     getSaveMessage = () => {
@@ -51,28 +47,25 @@ class Endpoint extends React.Component{
         if(headers){
             return (
                 <Form.Item label="Headers">
-                    <Button type="dashed" onClick={this.addNewHeader}><Icon type="plus" />Add header</Button>
+                    <Button type="dashed" onClick={this.props.addNewHeader}><Icon type="plus" />Add header</Button>
                     {headers.map( (header, index) => {
                         const inputNum = Object.keys(header)[0] //Ej: Input_0
-                        const key = Object.keys(header[inputNum])[0]
-                        const value = header[inputNum][key]
-                        // console.log("header", header)
-                        // console.log("inputNum", inputNum)
-                        // console.log("key", key)
-                        // console.log("value", value)
+                        const headerKey = Object.keys(header[inputNum])[0] //Content-type
+                        const headerValue = header[inputNum][headerKey]   //application/json
 
                         return(
                             <div key={index}>
                                 <Input
                                     style={{width: 200, marginRight: 20}}
-                                    key={`${inputNum}_key`} value={key} name={key}
-                                    onChange={(e) => this.props.changeHeader(index, inputNum, true, value)}
+                                    key={`${inputNum}_key`} value={headerKey} name={headerKey}
+                                    onChange={(e) => this.props.changeHeader(index, inputNum, true, headerValue, headerKey, e.target.value)}
                                 />
                                 <Input
                                     style={{width: 200}}
-                                    key={`${inputNum}_value`} value={value} name={value}
-                                    onChange={(e) => this.props.changeHeader(index, inputNum, false, e.target.value)}
+                                    key={`${inputNum}_value`} value={headerValue} name={headerValue}
+                                    onChange={(e) => this.props.changeHeader(index, inputNum, false, e.target.value, headerKey, null)}
                                 />
+                                <a onClick={() =>{this.props.deleteHeader(index)}} style={{marginLeft: 5}}><Icon type="minus-circle"/></a>
                                 <br />
 
                             </div>
