@@ -17,8 +17,9 @@ class Endpoint extends React.Component{
     
     showAlert = () => {
         var message="An error occurred while saving the endpoint. Please try again";
-        if ( this.props.errorMessage != "" ) {
-            message = this.props.errorMessage;
+        console.log("Error message", this.props.errorMessage)
+        if ( this.props.errorMessage !== undefined) {
+            message = this.props.errorMessage
         } 
         switch(this.props.saveStatus){
             case "success":
@@ -52,8 +53,12 @@ class Endpoint extends React.Component{
         if(headers){
             return (
                 <Form.Item label="Headers">
-                    <Button type="dashed" onClick={this.props.addNewHeader}><Icon type="plus" />Add header</Button>
+                    <Button type="dashed" onClick={(e) => this.props.addNewHeader()}><Icon type="plus" />Add header</Button>
                     {headers.map( (header, index) => {
+                        if(!header){
+                            this.props.changeHeader(index, `input_${index}`, true, "", "")
+                            return ""
+                        }
                         const inputNum = Object.keys(header)[0] //Ej: Input_0
                         const headerKey = Object.keys(header[inputNum])[0] //Content-type
                         const headerValue = header[inputNum][headerKey]   //application/json
@@ -145,7 +150,7 @@ class Endpoint extends React.Component{
                         <h2>Response</h2>
                         <Form.Item label="Status">
                             <Input style={{ width: 60 }}
-                                id="statusCode" value={this.props.data.httpResponse.statusCode} name="statusCode"
+                                id="status_code" value={this.props.data.httpResponse.status_code} name="status_code"
                                 onChange={(e) => this.props.handleChange(e, 'httpResponse')}
                             />
                         </Form.Item>

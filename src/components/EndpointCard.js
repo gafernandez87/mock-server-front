@@ -43,11 +43,11 @@ class EndpointCard extends React.Component{
                     </Tag>
                     <span style={{fontWeight: 600}}>{endpoint.httpRequest.path}</span>
                 </div>
-                <p style={{fontWeight: 600}}>{endpoint.httpResponse.statusCode}</p>
+                <p style={{fontWeight: 600}}>{endpoint.httpResponse.status_code}</p>
                 <pre style={{backgroundColor: "#ffffff", border: "1px dashed #585858", padding: "5px"}}>
                     {JSON.stringify(endpoint.httpResponse.body, null, 2)}
                 </pre>
-                <span>Published path: </span><Tag color="volcano">{prefix}{endpoint.httpRequest.path}</Tag>
+                <span>Published path: </span><Tag color="purple">{prefix}{endpoint.httpRequest.path}</Tag>
             </Card>
         )
     }

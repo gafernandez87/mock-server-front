@@ -12,7 +12,7 @@ const emptyEndpoint = {
         method: "GET"
     },
     httpResponse: {
-        statusCode: 200
+        status_code: 200
     },
     saveStatus: "",
     errorMessage: ""
@@ -40,12 +40,12 @@ class EndpointsList extends React.Component {
         let currentEndpoint = {...this.state.currentEndpoint}
         let newHeaders = [...currentEndpoint.newHeaders]
         
-        const l = Object.keys(newHeaders).length
-        const input = `input_${l}`
+        const index = Object.keys(newHeaders).length
+        const input = `input_${index}`
         let subObject = {} 
 
         subObject[input] = {"":""}
-        newHeaders[l] = subObject
+        newHeaders[index] = subObject
 
         currentEndpoint.newHeaders = newHeaders
         this.setState({currentEndpoint})
@@ -54,7 +54,7 @@ class EndpointsList extends React.Component {
     deleteHeader = (index) => {
         let currentEndpoint = {...this.state.currentEndpoint}
         let newHeaders = [...currentEndpoint.newHeaders]
-        delete newHeaders[index]
+        newHeaders.splice(index, 1)
         currentEndpoint.newHeaders = newHeaders
         this.setState({currentEndpoint})
     }
@@ -92,7 +92,6 @@ class EndpointsList extends React.Component {
     convertToHeader = () => {
         let newHeaders = {...this.state.currentEndpoint.newHeaders}
         let l = Object.keys(newHeaders).length
-        console.log(newHeaders)
         let result = {}
         for(let i = 0; i < l; i++){
             try{
@@ -123,19 +122,26 @@ class EndpointsList extends React.Component {
         const url = this.state.newEndpoint ? `${Constants.API_URL}/mocks/${mockId}/endpoints` : `${Constants.API_URL}/mocks/${mockId}/endpoints/${updatedEndpoint._id}`;
         const method = this.state.newEndpoint ? "post" : "put";
 
-        (axios[method])(url, updatedEndpoint)
+        //Saco los datos que no quiero guardar
+        const {newHeaders, stringBody, ...endpointToSave} = {...updatedEndpoint};
+
+        axios[method](url, endpointToSave)
         .then(_ => {
             this.setState({
-                currentEndpoint: updatedEndpoint,
-                saveStatus: "success"
+                currentEndpoint: {
+                    ...updatedEndpoint,
+                    httpRequest: { ...updatedEndpoint.httpRequest },
+                    httpResponse: { ...updatedEndpoint.httpResponse },
+                    stringBody: JSON.stringify(updatedEndpoint.httpResponse.body, null, 2),
+                    newHeaders: this.getNewHeaders(updatedEndpoint.httpResponse.headers)
+                },
+                saveStatus: "success",
+                newEndpoint: false
             })
+
             this.props.refreshEndpointList(mockId)
-            return updatedEndpoint
-        })
-        .then(updatedEndpoint => {
-            this.selectEndpoint(updatedEndpoint)
         }).catch(err => {
-            console.error(err)
+            console.error("Error", err)
             this.setState({
                 saveStatus: "error"
             })
@@ -242,7 +248,13 @@ class EndpointsList extends React.Component {
     }
 
     getSubTitle = () => {
-        return (`Path prefix: ${this.props.getMockPrefix()}`)
+        const prefix = this.props.getMockPrefix()
+        if(prefix){
+            return (`Path prefix: ${prefix}`)
+        }else{
+            return ("")
+        }
+        
     }
 
     render(){
