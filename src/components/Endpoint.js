@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card,  Form, Input, Select, Button, Affix, Alert, Modal, Icon, Steps } from 'antd';
+import { Card,  Form, Input, Select, Button, Affix, Alert, Modal, Icon, Steps, Popover } from 'antd';
 
 const { Option } = Select;
 const confirm = Modal.confirm;
@@ -17,7 +17,6 @@ class Endpoint extends React.Component{
     
     showAlert = () => {
         var message="An error occurred while saving the endpoint. Please try again";
-        console.log("Error message", this.props.errorMessage)
         if ( this.props.errorMessage !== undefined) {
             message = this.props.errorMessage
         } 
@@ -50,41 +49,40 @@ class Endpoint extends React.Component{
     }
 
     renderHeaders = (headers) => {
-        if(headers){
-            return (
-                <Form.Item label="Headers">
-                    <Button type="dashed" onClick={(e) => this.props.addNewHeader()}><Icon type="plus" />Add header</Button>
-                    {headers.map( (header, index) => {
-                        if(!header){
-                            this.props.changeHeader(index, `input_${index}`, true, "", "")
-                            return ""
-                        }
-                        const inputNum = Object.keys(header)[0] //Ej: Input_0
-                        const headerKey = Object.keys(header[inputNum])[0] //Content-type
-                        const headerValue = header[inputNum][headerKey]   //application/json
+        headers = headers || []
+        return (
+            <Form.Item label="Headers">
+                <Button type="dashed" onClick={(e) => this.props.addNewHeader()}><Icon type="plus" />Add header</Button>
+                {headers.map( (header, index) => {
+                    if(!header){
+                        this.props.changeHeader(index, `input_${index}`, true, "", "")
+                        return ""
+                    }
+                    const inputNum = Object.keys(header)[0] //Ej: Input_0
+                    const headerKey = Object.keys(header[inputNum])[0] //Content-type
+                    const headerValue = header[inputNum][headerKey]   //application/json
 
-                        return(
-                            <div key={index}>
-                                <Input
-                                    style={{width: 200, marginRight: 20}}
-                                    key={`${inputNum}_key`} value={headerKey} name={headerKey}
-                                    onChange={(e) => this.props.changeHeader(index, inputNum, true, headerValue, headerKey, e.target.value)}
-                                />
-                                <Input
-                                    style={{width: 200}}
-                                    key={`${inputNum}_value`} value={headerValue} name={headerValue}
-                                    onChange={(e) => this.props.changeHeader(index, inputNum, false, e.target.value, headerKey, null)}
-                                />
-                                <a onClick={() =>{this.props.deleteHeader(index)}} style={{marginLeft: 5}}><Icon type="minus-circle"/></a>
-                                <br />
+                    return(
+                        <div key={index}>
+                            <Input
+                                style={{width: 200, marginRight: 20}}
+                                key={`${inputNum}_key`} value={headerKey} name={headerKey}
+                                onChange={(e) => this.props.changeHeader(index, inputNum, true, headerValue, headerKey, e.target.value)}
+                            />
+                            <Input
+                                style={{width: 200}}
+                                key={`${inputNum}_value`} value={headerValue} name={headerValue}
+                                onChange={(e) => this.props.changeHeader(index, inputNum, false, e.target.value, headerKey, null)}
+                            />
+                            <a onClick={() =>{this.props.deleteHeader(index)}} style={{marginLeft: 5}}><Icon type="minus-circle"/></a>
+                            <br />
 
-                            </div>
-                        )
-                    })}
-                    
-                </Form.Item>
-            )
-        }
+                        </div>
+                    )
+                })}
+                
+            </Form.Item>
+        )
     }
 
     render() {
@@ -99,7 +97,7 @@ class Endpoint extends React.Component{
             }
         };
         const isNewEndpoint = this.props.isNewEndpoint
-
+        console.log(this.props.data.stringBody)
         return (
             <Affix offsetTop={10}>
                 {this.showAlert()}
@@ -158,11 +156,14 @@ class Endpoint extends React.Component{
                         {this.renderHeaders(this.props.data.newHeaders)}
                         
                         <Form.Item label="Body" className={this.props.bodyClass}>
-                            <Input.TextArea 
-                                rows={6} id="body" 
-                                value={this.props.data.stringBody} name="body"
-                                onChange={(e) => this.props.handleChange(e)}
-                            />
+                            <Popover title="Response body" placement="topRight" trigger="hover"
+                                    content="Body must be a json object">
+                                <Input.TextArea 
+                                    rows={6} id="body" 
+                                    value={this.props.data.stringBody} name="body"
+                                    onChange={(e) => this.props.handleChange(e)}
+                                />
+                            </Popover>
                             {this.props.bodyClass === "error" ? <p>Invalid JSON. Please fix it before hitting save</p> : ""}
                         </Form.Item>
                         <Button type="primary" onClick={() => this.props.saveEndpoint()} style={{float: "right"}}>{this.getButtonText()}</Button>

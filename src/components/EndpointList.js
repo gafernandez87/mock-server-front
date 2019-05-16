@@ -14,8 +14,10 @@ const emptyEndpoint = {
     httpResponse: {
         status_code: 200
     },
+    newHeaders: [],
     saveStatus: "",
-    errorMessage: ""
+    errorMessage: "",
+    stringBody: "{}"
 }
 
 const Step = Steps.Step;
