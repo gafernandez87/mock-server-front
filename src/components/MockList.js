@@ -3,7 +3,6 @@ import { Row, Col, Table, Menu, Icon, Modal, Form, Input, Select, Button, Alert,
 import Highlighter from 'react-highlight-words';
 import axios from 'axios';
 import Constants from '../config/Constants'
-import { object } from 'prop-types';
 
 const {Option} = Select
 const emptyMock = {
@@ -11,10 +10,10 @@ const emptyMock = {
     author: "",
     description: "",
     prefix: "/mock",
-    brand: "",
+    country: "",
     product: ""
 }
-const brandList = ["AR", "UY", "ES", "MX"]
+const countryList = ["AR", "UY", "ES", "MX"]
 const productList = ["WELP", "PRESTO", "POSTA", "MANGO", "LUQUITAS"]
 const formItemLayout = {
     labelCol: {
@@ -43,10 +42,13 @@ class MockList extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            modalVisible: false,
-            confirmLoading: false,
-            saveStatus: "",
-            newMock: emptyMock,
+            modal: {
+                visible: false,
+                confirmLoading: false,
+                data: emptyMock,
+                buttonText: "Create",
+                title: "New mock"
+            },
             searchText: ""
         }
     }
@@ -63,24 +65,51 @@ class MockList extends React.Component {
         });
     }
 
-    showModal = () => {
-        this.setState({modalVisible: true});
+    showEditModal = (mockId) => {
+        const toEdit = this.props.list.filter(mock => mockId === mock._id)[0]
+        const data = {
+            mockId: mockId,
+            name: toEdit.name,
+            author: toEdit.author,
+            description: toEdit.description,
+            prefix: toEdit.prefix,
+            country: toEdit.country,
+            product: toEdit.product
+        }
+
+        const modal = {...this.state.modal}
+        modal.visible = true;
+        modal.data = data;
+        modal.buttonText = "Edit";
+        modal.title = "Edit mock";
+        modal.submit = this.editMock;
+
+        this.setState({modal});
     }
 
-    closeAlert = () => {
-        this.setState({saveStatus: ""})
+    showCreateModal = () => {
+        const modal = {...this.state.modal}
+        modal.visible = true;
+        modal.buttonText = "Create";
+        modal.title = "New mock";
+        modal.submit = this.createMock
+        modal.data = emptyMock;
+        this.setState({modal});
     }
 
-    createMock = () => {
-        this.setState({ confirmLoading: true});
+    createMock = () => {        
+        const modal = {...this.state.modal}
+        modal.confirmLoading = true
+        this.setState({modal});
         
-        axios.post(`${Constants.API_URL}/mocks`, this.state.newMock)
+        axios.post(`${Constants.API_URL}/mocks`, this.state.modal.data)
         .then(_ => {
             this.props.refreshMockList()
-            
+            modal.confirmLoading = false;
+            modal.data = emptyMock;
+            modal.buttonText = "Create";
             this.setState({
-                confirmLoading: false,
-                newMock: emptyMock,
+                modal,
                 saveStatus: "success"
             });
             
@@ -89,15 +118,54 @@ class MockList extends React.Component {
             this.setState({saveStatus: "error"})
         })
     }
+
+    editMock = () => {
+        const {mockId, ...data} = this.state.modal.data
+        const modal = {...this.state.modal}
+
+        modal.confirmLoading = true
+        this.setState({modal});
+        
+        axios.put(`${Constants.API_URL}/mocks/${mockId}`, data)
+        .then(_ => {
+            this.props.refreshMockList()
+            modal.confirmLoading = false;
+            this.setState({
+                modal,
+                saveStatus: "success"
+            });
+            
+        }).catch(err => {
+            console.error(err)
+            this.setState({saveStatus: "error"})
+        })   
+    }
     
+    cloneMock = (mockId) => {
+        axios.get(`${Constants.API_URL}/mocks/${mockId}/clone`)
+        .then(_ => {
+            this.props.refreshMockList()
+            this.setState({
+                saveStatus: "success"
+            });
+        }).catch(err => {
+            console.error(err)
+            this.setState({
+                saveStatus: "error"
+            })
+        })
+    }
+
     handleCancel = () => {
-        this.setState({modalVisible: false});
+        const modal = {...this.state.modal}
+        modal.visible = false
+        this.setState({modal});
     }
 
     handleChange = (e) => {
-        let newMock = {...this.state.newMock}
-        newMock[e.target.name] = e.target.value
-        this.setState({newMock})
+        let modal = {...this.state.modal}
+        modal.data[e.target.name] = e.target.value
+        this.setState({modal})
     }
 
     showAlert = () =>{
@@ -116,7 +184,11 @@ class MockList extends React.Component {
                 break;
         }
     }
-    
+
+    closeAlert = () => {
+        this.setState({saveStatus: ""})
+    }
+
     getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({
           setSelectedKeys, selectedKeys, confirm, clearFilters,
@@ -179,7 +251,7 @@ class MockList extends React.Component {
         return structure.map(column => {
             let obj = {}
 
-            if(column.name != "actions") {
+            if(column.name !== "actions") {
                 obj = {
                     ...this.getColumnSearchProps(column.name)
                 }
@@ -194,10 +266,37 @@ class MockList extends React.Component {
         })
     }
 
+    doAction = (e, mockId, name, prefix) => {
+        switch(e){
+            case "SHOW":
+                this.props.showMock(mockId, name, prefix);
+                break;
+            case "EDIT":
+                this.showEditModal(mockId, this.props.editMock);
+                break;
+            case "DELETE":
+                this.showDeleteConfirm(mockId, this.props.deleteMock);
+                break;
+            case "CLONE":
+                this.cloneMock(mockId);
+                break;
+            default:
+                //DO NOTHING
+                break;
+        }
+
+    }
+
     generateActions = (mockId, name, prefix) => {
         return (<div>
-            <a href="javascript:;" onClick={() => this.props.showMock(mockId, name, prefix)}>Show</a> | <a href="javascript:;" onClick={() => this.showDeleteConfirm(mockId, this.props.deleteMock)}>Delete</a>
-            </div>)
+            <Select value="" onChange={(e) => this.doAction(e, mockId, name, prefix)}>
+                <Option key="" value="" disabled>action</Option>
+                <Option key="show" value="SHOW">SHOW</Option>
+                <Option key="edit" value="EDIT">EDIT</Option>
+                <Option key="clone" value="CLONE">CLONE</Option>
+                <Option key="delete" value="DELETE">DELETE</Option>
+            </Select>
+        </div>)
     }
 
     render(){
@@ -208,7 +307,7 @@ class MockList extends React.Component {
                 description: mock.description,
                 prefix: mock.prefix,
                 author: mock.author,
-                brand: mock.brand,
+                country: mock.country,
                 product: mock.product,
                 creation_date: mock.creation_date,
                 actions: this.generateActions(mock._id, mock.name, mock.prefix)
@@ -217,9 +316,9 @@ class MockList extends React.Component {
         const columns = this.generateTableStructure([
             {title: "Name", name: "name", width:"15%"},
             {title: "Description", name: "description", width:"20%"},
-            {title: "Prefix", name: "prefix", width:"5%"},
+            {title: "Prefix", name: "prefix", width:"10%"},
             {title: "Author", name: "author", width:"15%"},
-            {title: "Brand", name: "brand", width:"10%"},
+            {title: "Country", name: "country", width:"5%"},
             {title: "Product", name: "product", width:"5%"},
             {title: "Creation date", name: "creation_date", width:"15%"},
             {title: "Actions", name: "actions", width:"10%"}])
@@ -227,15 +326,16 @@ class MockList extends React.Component {
         return (
             <div>
                 <Modal
-                    title="NEW MOCK GROUP"
-                    visible={this.state.modalVisible}
-                    confirmLoading={this.stateconfirmLoading}
+                    title={this.state.modal.title}
+                    visible={this.state.modal.visible}
+                    confirmLoading={this.state.modal.confirmLoading}
                     onCancel={this.handleCancel}
                     footer={[
                         <Button key="back" onClick={this.handleCancel}>Close</Button>,
-                        <Button key="submit" type="primary" onClick={this.createMock} 
-                                loading={this.state.confirmLoading}>
-                          Create
+                        <Button key="submit" type="primary" 
+                                onClick={this.state.modal.submit} 
+                                loading={this.state.modal.confirmLoading}>
+                          {this.state.modal.buttonText}
                         </Button>,
                       ]}
                     >
@@ -244,21 +344,21 @@ class MockList extends React.Component {
                             <Form.Item label="Name">
                                 <Input 
                                     id="name" name="name"
-                                    value={this.state.newMock.name}
+                                    value={this.state.modal.data.name}
                                     onChange={(e) => this.handleChange(e)}
                                 />
                             </Form.Item>
                             <Form.Item label="Author">
                                 <Input 
                                     id="author" name="author"
-                                    value={this.state.newMock.author}
+                                    value={this.state.modal.data.author}
                                     onChange={(e) => this.handleChange(e)}
                                 />
                             </Form.Item>
                             <Form.Item label="Description">
                                 <Input 
                                     id="description" name="description"
-                                    value={this.state.newMock.description}
+                                    value={this.state.modal.data.description}
                                     onChange={(e) => this.handleChange(e)}
                                 />
                             </Form.Item>
@@ -267,18 +367,18 @@ class MockList extends React.Component {
                                 start with this prefix path. Example: /mock" title="Prefix" placement="leftTop" trigger="hover">
                                     <Input 
                                     id="prefix" name="prefix"
-                                    value={this.state.newMock.prefix}
+                                    value={this.state.modal.data.prefix}
                                     onChange={(e) => this.handleChange(e)}
                                 />
                                 </Popover>
                             </Form.Item>
-                            <Form.Item label="Brand">
+                            <Form.Item label="Country">
                                 <Select 
-                                    onChange={(e) => this.handleChange({ target: { name: "brand", value: e } })}
-                                    id="brand" value={this.state.newMock.brand} name="brand"
+                                    onChange={(e) => this.handleChange({ target: { name: "country", value: e } })}
+                                    id="country" value={this.state.modal.data.country} name="country"
                                 >
-                                    {brandList.map(brand => {
-                                        return (<Option key={brand} value={brand}>{brand}</Option>)
+                                    {countryList.map(country => {
+                                        return (<Option key={country} value={country}>{country}</Option>)
                                     })}
                                 </Select>
                                 
@@ -286,7 +386,7 @@ class MockList extends React.Component {
                             <Form.Item label="Product">
                                 <Select 
                                     onChange={(e) => this.handleChange({ target: { name: "product", value: e } })}
-                                    id="brand" value={this.state.newMock.product} name="product"
+                                    id="product" value={this.state.modal.data.product} name="product"
                                 >
                                     {productList.map(product => {
                                         return (<Option key={product} value={product}>{product}</Option>)
@@ -298,8 +398,8 @@ class MockList extends React.Component {
                 <Row style={{marginBottom: 10}}>
                     <Col>
                         <Menu mode="horizontal">
-                            <Menu.Item key="newEndpoint" onClick={this.showModal}>
-                                <Icon type="plus" />NEW MOCK GROUP
+                            <Menu.Item key="newEndpoint" onClick={this.showCreateModal}>
+                                <Icon type="plus" />NEW MOCK
                             </Menu.Item>
                             <Menu.Item key="help" style={{marginLeft: "auto", background: "none"}}>
                                 <Popover content={content} title="Route" placement="leftTop" trigger="hover">

@@ -51,7 +51,6 @@ class MockCard extends React.Component{
     render(){
         const {item, index} = this.props
         
-
         return (
             <List.Item 
                 onMouseEnter={this.enter}
@@ -59,7 +58,7 @@ class MockCard extends React.Component{
                 onClick={() => this.props.showMock(item._id)}
                 style={this.state.cardStyle}
                 key={index} 
-                actions={[<IconText type="credit-card" text={item.product} />, <IconText type="flag" text={item.brand} />]}>
+                actions={[<IconText type="credit-card" text={item.product} />, <IconText type="flag" text={item.country} />]}>
                 <List.Item.Meta
                 title={<b>{item.name}</b>}
                 description={item.description}

@@ -53,11 +53,7 @@ class App extends React.Component {
   deleteMock = (mockId) => {
     axios.delete(`${Constants.API_URL}/mocks/${mockId}`)
     .then(data => {
-        console.log("Delete result", data)
-        return axios.get(`${Constants.API_URL}/mocks`)
-    })
-    .then(result => {
-      this.setState({mockList: result.data})
+        this.refreshMockList()
     }).catch(err => {
         console.error(err)
         this.setState({

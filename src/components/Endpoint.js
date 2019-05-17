@@ -97,7 +97,6 @@ class Endpoint extends React.Component{
             }
         };
         const isNewEndpoint = this.props.isNewEndpoint
-        console.log(this.props.data.stringBody)
         return (
             <Affix offsetTop={10}>
                 {this.showAlert()}

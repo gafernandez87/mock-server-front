@@ -39,7 +39,9 @@ class BodyContent extends React.Component{
                 list={this.props.mockList} 
                 showMock={this.showMock} 
                 deleteMock={this.props.deleteMock} 
-                refreshMockList={this.props.refreshMockList}/>)
+                cloneMock={this.props.cloneMock} 
+                refreshMockList={this.props.refreshMockList}
+                />)
 
           case "endpoints":
             return (<EndpointList 
@@ -48,7 +50,8 @@ class BodyContent extends React.Component{
                 getMockId={this.getMockId}
                 getMockName={this.getMockName}
                 getMockPrefix={this.getMockPrefix}
-                changePage={this.props.changePage} />)
+                changePage={this.props.changePage}
+                />)
           default:
             return (<div>You should not be here... RUN!</div>)
       }

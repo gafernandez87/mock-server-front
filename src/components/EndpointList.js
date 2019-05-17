@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Row, Col, PageHeader, Input, Icon, Button, Steps } from 'antd';
+import { Row, Col, PageHeader, Icon, Button, Steps } from 'antd';
 import Endpoint from './Endpoint'
 import EndpointCard from './EndpointCard'
 import Constants from '../config/Constants'
@@ -109,7 +109,7 @@ class EndpointsList extends React.Component {
     saveEndpoint = () => {
         const updatedEndpoint = { ...this.state.currentEndpoint}
 
-        if ( updatedEndpoint.httpRequest.path.substring(0, 1) != "/" ) {
+        if ( updatedEndpoint.httpRequest.path.substring(0, 1) !== "/" ) {
             this.setState({
                 saveStatus: "error",
                 errorMessage: 'The first character of the path must be "/"'
@@ -156,7 +156,6 @@ class EndpointsList extends React.Component {
 
         axios.delete(`${Constants.API_URL}/mocks/${mockId}/endpoints/${endpointId}`)
         .then(data => {
-            console.log("Delete result", data)
             this.setState({currentEndpoint: emptyEndpoint})
             this.props.refreshEndpointList(mockId)
         }).catch(err => {
