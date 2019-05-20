@@ -20,6 +20,10 @@ class EndpointCard extends React.Component{
         }
     }
 
+    publishedPath = (prefix, path) =>{
+        return `http://integrations.dev.fintechpeople.io:4443/mock-server${prefix}${path}`
+    }
+
     render(){
         const {index, endpoint, selectedId, prefix} = this.props
 
@@ -47,7 +51,9 @@ class EndpointCard extends React.Component{
                 <pre style={{backgroundColor: "#ffffff", border: "1px dashed #585858", padding: "5px"}}>
                     {JSON.stringify(endpoint.httpResponse.body, null, 2)}
                 </pre>
-                <span>Published path: </span><Tag color="purple">{prefix}{endpoint.httpRequest.path}</Tag>
+                <span>Published path: </span>
+                <a target="_blank" href={this.publishedPath(prefix,endpoint.httpRequest.path)}>
+                <Tag style={{cursor: "pointer"}}  color="purple">{prefix}{endpoint.httpRequest.path}</Tag></a>
             </Card>
         )
     }

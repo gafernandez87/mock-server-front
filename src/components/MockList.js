@@ -289,9 +289,9 @@ class MockList extends React.Component {
 
     generateActions = (mockId, name, prefix) => {
         return (<div>
-            <Select value="" onChange={(e) => this.doAction(e, mockId, name, prefix)}>
-                <Option key="" value="" disabled>action</Option>
-                <Option key="show" value="SHOW">SHOW</Option>
+            <Select style={{width: 130}} value="" onChange={(e) => this.doAction(e, mockId, name, prefix)}>
+                <Option key="" value="" disabled>actions</Option>
+                <Option key="show" value="SHOW">ENDPOINTS</Option>
                 <Option key="edit" value="EDIT">EDIT</Option>
                 <Option key="clone" value="CLONE">CLONE</Option>
                 <Option key="delete" value="DELETE">DELETE</Option>
@@ -299,6 +299,12 @@ class MockList extends React.Component {
         </div>)
     }
 
+    popOverTitle = () => {
+        return (<div>
+                    <p>Everyy endpoints under this mock will begin with this <b>prefix</b></p>
+                    <p>Example: /mock</p>
+                </div>)
+    }
     render(){
         const data = this.props.list.map( (mock, index) => {
             return {
@@ -321,7 +327,7 @@ class MockList extends React.Component {
             {title: "Country", name: "country", width:"5%"},
             {title: "Product", name: "product", width:"5%"},
             {title: "Creation date", name: "creation_date", width:"15%"},
-            {title: "Actions", name: "actions", width:"10%"}])
+            {title: "Actions", name: "actions", width:"15%"}])
 
         return (
             <div>
@@ -363,8 +369,7 @@ class MockList extends React.Component {
                                 />
                             </Form.Item>
                             <Form.Item label="Prefix">
-                                <Popover content="all the endpoints in the group 
-                                start with this prefix path. Example: /mock" title="Prefix" placement="leftTop" trigger="hover">
+                                <Popover content={this.popOverTitle()} title="Prefix" placement="rightTop" trigger="hover">
                                     <Input 
                                     id="prefix" name="prefix"
                                     value={this.state.modal.data.prefix}

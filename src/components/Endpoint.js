@@ -85,6 +85,13 @@ class Endpoint extends React.Component{
         )
     }
 
+    content = () => {
+        return (<div>
+                    <p>Time that the server wait before sending the repsonse in milliseconds.</p>
+                    <p>Ej: 5000 (5 seconds).</p>
+                    <p>Default 1</p>
+                </div>)
+    }
     render() {
         const formItemLayout = {
             labelCol: {
@@ -145,11 +152,23 @@ class Endpoint extends React.Component{
                         <hr />
 
                         <h2>Response</h2>
-                        <Form.Item label="Status">
+
+                        <Form.Item label="Status code">
                             <Input style={{ width: 60 }}
                                 id="status_code" value={this.props.data.httpResponse.status_code} name="status_code"
                                 onChange={(e) => this.props.handleChange(e, 'httpResponse')}
                             />
+                        </Form.Item>
+
+                        <Form.Item label="Delay">
+                            <Popover title="Delay" placement="rightTop" trigger="hover"
+                                    content={this.content()}>
+                                <Input style={{ width: 90 }}
+                                    id="timeout" value={this.props.data.httpResponse.timeout || 1} name="timeout"
+                                    onChange={(e) => this.props.handleChange(e, 'httpResponse')}
+                                />
+                            </Popover>
+
                         </Form.Item>
                         
                         {this.renderHeaders(this.props.data.newHeaders)}
