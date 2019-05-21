@@ -84,11 +84,20 @@ class Endpoint extends React.Component{
             </Form.Item>
         )
     }
+    methodTooltipContent = (prefix, path) => {
+        console.log("prefix", prefix)
+        return (<div>
+                    <p>Path where you want to do your request.</p>
+                    <p>Example: /api/v1/users/1</p>
+                    <p>Path MUST start with <b>/</b></p>
+                    <p>Be aware of the prefix. Your current path is: {prefix}{path}</p>
+                </div>)
+    }
 
-    content = () => {
+    delayTooltipContent = () => {
         return (<div>
                     <p>Time that the server wait before sending the repsonse in milliseconds.</p>
-                    <p>Ej: 5000 (5 seconds).</p>
+                    <p>Example: 5000 (5 seconds).</p>
                     <p>Default 1</p>
                 </div>)
     }
@@ -142,11 +151,14 @@ class Endpoint extends React.Component{
                                 <Option value="PATCH">PATCH</Option>
                                 <Option value="DELETE">DELETE</Option>
                             </Select>
-                            <Input 
-                                id="path" value={this.props.data.httpRequest.path} name="path"
-                                onChange={(e) => this.props.handleChange(e, 'httpRequest')}
-                                style={{width: "81%", marginLeft: 10}}
-                            />
+                            <Popover title="Path" placement="bottomRight" trigger="hover"
+                                    content={this.methodTooltipContent(this.props.data.httpRequest.prefix, this.props.data.httpRequest.path)}>
+                                <Input 
+                                    id="path" value={this.props.data.httpRequest.path} name="path"
+                                    onChange={(e) => this.props.handleChange(e, 'httpRequest')}
+                                    style={{width: "81%", marginLeft: 10}}
+                                />
+                            </Popover>
                         </Form.Item>
                         
                         <hr />
@@ -162,7 +174,7 @@ class Endpoint extends React.Component{
 
                         <Form.Item label="Delay">
                             <Popover title="Delay" placement="rightTop" trigger="hover"
-                                    content={this.content()}>
+                                    content={this.delayTooltipContent()}>
                                 <Input style={{ width: 90 }}
                                     id="timeout" value={this.props.data.httpResponse.timeout || 1} name="timeout"
                                     onChange={(e) => this.props.handleChange(e, 'httpResponse')}

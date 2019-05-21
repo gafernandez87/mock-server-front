@@ -21,7 +21,7 @@ class EndpointCard extends React.Component{
     }
 
     publishedPath = (prefix, path) =>{
-        return `http://integrations.dev.fintechpeople.io:4443/mock-server${prefix}${path}`
+        return `https://integrations.dev.fintechpeople.io:4443/mock-server${prefix}${path}`
     }
 
     render(){
