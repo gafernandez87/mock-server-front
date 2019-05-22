@@ -1,9 +1,9 @@
 import React from 'react';
-import axios from 'axios';
 import { Row, Col, PageHeader, Icon, Button, Steps } from 'antd';
 import Endpoint from './Endpoint'
 import EndpointCard from './EndpointCard'
-import Constants from '../config/Constants'
+import endpointService from '../services/EndpointService'
+import mockService from '../services/MockService'
 
 const emptyEndpoint = {
     name: "new endpoint",
@@ -19,19 +19,27 @@ const emptyEndpoint = {
     errorMessage: "",
     stringBody: "{}"
 }
-
-const Step = Steps.Step;
+const Step = Steps.Step
 
 class EndpointsList extends React.Component {
 
     constructor(props){
         super(props)
 
+        const mock_id = props.match.params.mock_id
+        
         this.state = {
+            parentMock: {
+                _id: mock_id
+            },
             currentEndpoint: {...emptyEndpoint},
-            mock_id: this.props.mock_id,
             newEndpoint: true
         }
+    }
+
+    componentDidMount = () => {
+        this.getParentMock()
+        this.refreshEndpointList()
     }
 
     closeAlert = () => {
@@ -119,16 +127,19 @@ class EndpointsList extends React.Component {
         updatedEndpoint.httpResponse.body = JSON.parse(this.state.currentEndpoint.stringBody)
         updatedEndpoint.httpResponse.headers = this.convertToHeader()
 
-        const mockId = this.props.getMockId()
-
-        const url = this.state.newEndpoint ? `${Constants.API_URL}/mocks/${mockId}/endpoints` : `${Constants.API_URL}/mocks/${mockId}/endpoints/${updatedEndpoint._id}`;
-        const method = this.state.newEndpoint ? "post" : "put";
-
         //Saco los datos que no quiero guardar
         const {newHeaders, stringBody, ...endpointToSave} = {...updatedEndpoint};
+        const mockId = this.state.parentMock._id
 
-        axios[method](url, endpointToSave)
-        .then(_ => {
+
+        let promise
+        if(this.state.newEndpoint){
+            promise = endpointService.create(mockId, endpointToSave)
+        }else{
+            promise = endpointService.update(mockId, endpointToSave._id, endpointToSave)
+        }
+        
+        promise.then(_ => {
             this.setState({
                 currentEndpoint: {
                     ...updatedEndpoint,
@@ -141,29 +152,40 @@ class EndpointsList extends React.Component {
                 newEndpoint: false
             })
 
-            this.props.refreshEndpointList(mockId)
+            this.refreshEndpointList()
         }).catch(err => {
             console.error("Error", err)
-            this.setState({
-                saveStatus: "error"
-            })
+            this.setState({saveStatus: "error"})
         })
     }
 
     deleteEndpoint = () => {
-        const mockId = this.props.getMockId()
+        const mockId = this.state.parentMock._id
         const endpointId = this.state.currentEndpoint._id
 
-        axios.delete(`${Constants.API_URL}/mocks/${mockId}/endpoints/${endpointId}`)
-        .then(data => {
+        endpointService.delete(mockId, endpointId)
+        .then(_ => {
             this.setState({currentEndpoint: emptyEndpoint})
-            this.props.refreshEndpointList(mockId)
+            this.refreshEndpointList()
         }).catch(err => {
             console.error(err)
-            this.setState({
-                saveStatus: "error"
-            })
+            this.setState({saveStatus: "error"})
         })
+    }
+
+    refreshEndpointList = () => {
+        endpointService.getAllByMock(this.state.parentMock._id)
+        .then(response => {
+            this.setState({endpointList: response.data})
+        })
+    }
+
+    getParentMock = () => {
+        mockService.get(this.state.parentMock._id)
+        .then(response => {
+            this.setState({parentMock: response.data[0]})
+        })
+        
     }
 
     changeBody = (e) => {
@@ -211,14 +233,14 @@ class EndpointsList extends React.Component {
     }
 
     renderEndpointList = () => {
-        return this.props.list.map( (endpoint, index) => {
+        return this.state.endpointList && this.state.endpointList.map( (endpoint, index) => {
             return (
                 <EndpointCard 
-                    selectedId={this.state.currentEndpoint._id} 
+                    selectedId={this.state.currentEndpoint._id}
                     key={index} 
                     endpoint={endpoint} 
                     index={index} 
-                    prefix={this.props.getMockPrefix()}
+                    prefix={this.state.parentMock.prefix}
                     selectEndpoint={this.selectEndpoint} />
             )
         })
@@ -245,33 +267,41 @@ class EndpointsList extends React.Component {
     }
 
     getTitle = () => {
-        return (`Mock GROUP: ${this.props.getMockName()}`)
+        return (`Mock GROUP: ${this.state.parentMock.name}`)
     }
 
     getSubTitle = () => {
-        const prefix = this.props.getMockPrefix()
+        const prefix = this.state.parentMock.prefix
         if(prefix){
             return (`Path prefix: ${prefix}`)
         }else{
-            return ("")
+            return ""
         }
         
     }
 
-    render(){
-        const isNewEndpoint = this.state.newEndpoint
+    getListClasses = () => {
+        return this.state.newEndpoint ? "blured" : ""
+    }
 
+    goBack = () => {
+        this.props.history.push("/");
+    }    
+
+    render(){
         return (
             <div>
                 <Row>
                     <Col>
                         <PageHeader
-                            onBack={() => this.props.changePage("mocks")}
+                            onBack={() => this.goBack()}
                             title={this.getTitle()}
                             subTitle={this.getSubTitle()}
                         >
                             <div>
-                                    <Button type="dashed" onClick={this.newEndpoint}><Icon type="plus" />Add Enpoint</Button>
+                                    <Button type="dashed" onClick={this.newEndpoint}>
+                                        <Icon type="plus" />Add Enpoint
+                                    </Button>
                             </div>
                         </PageHeader>
                     </Col>
@@ -281,12 +311,9 @@ class EndpointsList extends React.Component {
                         <Steps current={1}>
                             <Step status="finish" title="Endpoint list" icon={<Icon type="ordered-list" />} />
                         </Steps>
-                        {isNewEndpoint && <div className="blured">
+                        <div className={this.getListClasses()}>
                             {this.renderEndpointList()}
-                        </div>}
-                        {!isNewEndpoint && <div>
-                            {this.renderEndpointList()}
-                        </div>}
+                        </div>
                     </Col>
                     <Col span={16}>
                         {this.renderEndpoint()}

@@ -3,6 +3,7 @@ import MockList from './MockList';
 import EndpointList from './EndpointList';
 import axios from 'axios';
 import Constants from '../config/Constants'
+import {BrowserRouter as Router, Route, Redirect} from 'react-router-dom'
 
 class BodyContent extends React.Component{
 
@@ -55,13 +56,38 @@ class BodyContent extends React.Component{
           default:
             return (<div>You should not be here... RUN!</div>)
       }
-  }
-  
+  } 
 
   render(){
-      return(
-          <div>{this.renderBody(this.props.page)}</div>
-      )
+    return(
+
+      <Router>
+        <Route exact path="/mocks" render={ (props) => {return <MockList {...props} /> }} />
+        {/* <Route exact path="/mocks" render={ (props) => <MockList {...props} />}/> */}
+        
+        {/* <Route exact path="/mocks/:mock_id/endpoints" render={props => this.renderEndpoints(, props)} />
+        <Route exact path="/endpoints" component= {() => {
+          if(this.props.mock_id){
+            return <EndpointList 
+              list={this.props.endpointList} 
+              refreshEndpointList={this.props.refreshEndpointList}
+              getMockId={this.getMockId}
+              getMockName={this.getMockName}
+              getMockPrefix={this.getMockPrefix}
+              changePage={this.props.changePage}
+            />
+          }else{
+            return <Redirect to="/mocks"/>
+          }
+        }
+          
+        }/> */}
+        
+
+      </Router>
+
+          // <div>{this.renderBody(this.props.page)}</div>
+    )
   }
 }
 

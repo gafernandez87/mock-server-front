@@ -52,7 +52,7 @@ class EndpointCard extends React.Component{
                     {JSON.stringify(endpoint.httpResponse.body, null, 2)}
                 </pre>
                 <span>Published path: </span>
-                <a target="_blank" href={this.publishedPath(prefix,endpoint.httpRequest.path)}>
+                <a target="_blank" rel="noopener noreferrer" href={this.publishedPath(prefix,endpoint.httpRequest.path)}>
                 <Tag style={{cursor: "pointer"}}  color="purple">{prefix}{endpoint.httpRequest.path}</Tag></a>
             </Card>
         )
