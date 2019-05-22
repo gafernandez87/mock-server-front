@@ -85,7 +85,6 @@ class Endpoint extends React.Component{
         )
     }
     methodTooltipContent = (prefix, path) => {
-        console.log("prefix", prefix)
         return (<div>
                     <p>Path where you want to do your request.</p>
                     <p>Example: /api/v1/users/1</p>
@@ -101,6 +100,15 @@ class Endpoint extends React.Component{
                     <p>Default 1</p>
                 </div>)
     }
+
+    handleChange = (e, model) => {
+        const reg = /\b[0-9]{1,3}\b/;
+        const value = e.target.value
+        if ((!Number.isNaN(value) && reg.test(value)) || value === '') {
+            this.props.handleChange(e, model);
+        }
+    }
+
     render() {
         const formItemLayout = {
             labelCol: {
@@ -156,7 +164,7 @@ class Endpoint extends React.Component{
                                 <Input 
                                     id="path" value={this.props.data.httpRequest.path} name="path"
                                     onChange={(e) => this.props.handleChange(e, 'httpRequest')}
-                                    style={{width: "81%", marginLeft: 10}}
+                                    style={{width: "81%", marginLeft: 10}} autoComplete="off"
                                 />
                             </Popover>
                         </Form.Item>
@@ -166,9 +174,10 @@ class Endpoint extends React.Component{
                         <h2>Response</h2>
 
                         <Form.Item label="Status code">
-                            <Input style={{ width: 60 }}
+                            <Input style={{ width: 80 }}
+                                maxLength={3}
                                 id="status_code" value={this.props.data.httpResponse.status_code} name="status_code"
-                                onChange={(e) => this.props.handleChange(e, 'httpResponse')}
+                                onChange={(e) => this.handleChange({...e}, 'httpResponse')}
                             />
                         </Form.Item>
 
