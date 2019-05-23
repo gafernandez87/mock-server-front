@@ -84,6 +84,8 @@ class MockList extends React.Component {
                 modal,
                 saveStatus: "success"
             });
+
+            setTimeout(this.closeAlert, 2000)
         })
         .catch(err => {
             console.log(err)
@@ -116,6 +118,8 @@ class MockList extends React.Component {
                 modal,
                 saveStatus: "success"
             });
+
+            setTimeout(this.closeAlert, 2000)
             
         }).catch(err => {
             console.error(err)
@@ -128,6 +132,7 @@ class MockList extends React.Component {
         .then(_ => {
             this.refreshMockList()
             this.setState({saveStatus: "success"});
+            setTimeout(this.closeAlert, 2000)
         }).catch(err => {
             console.error(err)
             this.setState({saveStatus: "error"})

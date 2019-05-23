@@ -152,6 +152,8 @@ class EndpointsList extends React.Component {
                 newEndpoint: false
             })
 
+            setTimeout(this.closeAlert, 2000)
+
             this.refreshEndpointList()
         }).catch(err => {
             console.error("Error", err)
