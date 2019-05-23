@@ -24,6 +24,19 @@ class EndpointCard extends React.Component{
         return `https://integrations.dev.fintechpeople.io:4443/mock-server${prefix}${path}`
     }
 
+    getCardTitle = (name) => {
+        return (<span>
+            <span>{name}</span>
+            <button type="primary" shape="circle"
+                    style={{float: "right", cursor: "pointer"}} 
+                    onClick={() => {this.props.cloneEndpoint()}}>
+                    Clone
+            </button>
+        </span>)
+    }
+
+
+
     render(){
         const {index, endpoint, selectedId, prefix} = this.props
 
@@ -34,7 +47,7 @@ class EndpointCard extends React.Component{
         return(
             <Card
                 key={index}
-                title={endpoint.name}
+                title={this.getCardTitle(endpoint.name)}
                 className={cardClasses}
                 onClick={() => this.props.selectEndpoint(endpoint)}
             >

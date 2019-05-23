@@ -163,9 +163,22 @@ class EndpointsList extends React.Component {
         const mockId = this.state.parentMock._id
         const endpointId = this.state.currentEndpoint._id
 
-        endpointService.delete(mockId, endpointId)
+        endpointService.remove(mockId, endpointId)
         .then(_ => {
             this.setState({currentEndpoint: emptyEndpoint})
+            this.refreshEndpointList()
+        }).catch(err => {
+            console.error(err)
+            this.setState({saveStatus: "error"})
+        })
+    }
+
+    cloneEndpoint = () => {
+        const mockId = this.state.parentMock._id
+        const endpointId = this.state.currentEndpoint._id
+
+        endpointService.clone(mockId, endpointId)
+        .then(_ => {
             this.refreshEndpointList()
         }).catch(err => {
             console.error(err)
@@ -241,7 +254,8 @@ class EndpointsList extends React.Component {
                     endpoint={endpoint} 
                     index={index} 
                     prefix={this.state.parentMock.prefix}
-                    selectEndpoint={this.selectEndpoint} />
+                    selectEndpoint={this.selectEndpoint}
+                    cloneEndpoint={this.cloneEndpoint} />
             )
         })
     }

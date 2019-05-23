@@ -25,6 +25,10 @@ class EndpointService {
     remove(mockId, endpointId){
         return axios.delete(`${Constants.API_URL}/mocks/${mockId}/endpoints/${endpointId}`)
     }
+
+    clone(mockId, endpointId){
+        return axios.get(`${Constants.API_URL}/mocks/${mockId}/endpoints/${endpointId}/clone`)
+    }
 }
 
 export default new EndpointService()
