@@ -27,7 +27,7 @@ class EndpointCard extends React.Component{
     getCardTitle = (name) => {
         return (<span>
             <span>{name}</span>
-            <Button type="primary" shape="circle"
+            <Button type="primary" shape="round"
                     style={{float: "right", cursor: "pointer"}} 
                     onClick={() => {this.props.cloneEndpoint()}}>
                     Clone
