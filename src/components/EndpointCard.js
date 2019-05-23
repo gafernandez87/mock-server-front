@@ -1,5 +1,5 @@
 import React from 'react'
-import {Card, Tag} from 'antd'
+import {Card, Tag, Button} from 'antd'
 
 class EndpointCard extends React.Component{
 
@@ -27,11 +27,11 @@ class EndpointCard extends React.Component{
     getCardTitle = (name) => {
         return (<span>
             <span>{name}</span>
-            <button type="primary" shape="circle"
+            <Button type="primary" shape="circle"
                     style={{float: "right", cursor: "pointer"}} 
                     onClick={() => {this.props.cloneEndpoint()}}>
                     Clone
-            </button>
+            </Button>
         </span>)
     }
 
