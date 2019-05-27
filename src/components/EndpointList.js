@@ -16,8 +16,7 @@ const emptyEndpoint = {
     },
     newHeaders: [],
     saveStatus: "",
-    errorMessage: "",
-    stringBody: "{}"
+    errorMessage: ""
 }
 const Step = Steps.Step
 
@@ -114,6 +113,16 @@ class EndpointsList extends React.Component {
         return result
     }
 
+    getBody = () => {
+        const {bodyType, body} = this.state.currentEndpoint.httpResponse
+
+        if(bodyType === "json"){
+            return JSON.parse(body)
+        }else {
+            return body
+        }
+    }
+
     saveEndpoint = () => {
         const updatedEndpoint = { ...this.state.currentEndpoint}
 
@@ -124,11 +133,10 @@ class EndpointsList extends React.Component {
             })
             return updatedEndpoint;
         }
-        updatedEndpoint.httpResponse.body = JSON.parse(this.state.currentEndpoint.stringBody)
         updatedEndpoint.httpResponse.headers = this.convertToHeader()
 
         //Saco los datos que no quiero guardar
-        const {newHeaders, stringBody, ...endpointToSave} = {...updatedEndpoint};
+        const {newHeaders, ...endpointToSave} = {...updatedEndpoint};
         const mockId = this.state.parentMock._id
 
 
@@ -145,7 +153,6 @@ class EndpointsList extends React.Component {
                     ...updatedEndpoint,
                     httpRequest: { ...updatedEndpoint.httpRequest },
                     httpResponse: { ...updatedEndpoint.httpResponse },
-                    stringBody: JSON.stringify(updatedEndpoint.httpResponse.body, null, 2),
                     newHeaders: this.getNewHeaders(updatedEndpoint.httpResponse.headers)
                 },
                 saveStatus: "success",
@@ -203,13 +210,24 @@ class EndpointsList extends React.Component {
         
     }
 
-    changeBody = (e) => {
-        const body = e.target.value
+    checkValidBody = (body) => {
+        const bodyType = this.state.currentEndpoint.httpResponse.bodyType
         let bodyClass = ""
-        try{
-            JSON.parse(body)
-        }catch(err){
-            bodyClass = "error"
+        
+        if(bodyType === "json"){
+            try{
+                JSON.parse(body)
+            }catch(err){
+                bodyClass = "error"
+            }
+        }else if(bodyType === "xml"){
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(body,"text/xml");
+            if (xmlDoc.getElementsByTagName('div').length === 0) {
+                bodyClass = ""
+            } else {
+                bodyClass = "error"
+            }
         }
 
         this.setState({bodyClass})
@@ -219,13 +237,12 @@ class EndpointsList extends React.Component {
         let currentEndpoint = { ...this.state.currentEndpoint };
         if(model) {
             currentEndpoint[model][e.target.name] = e.target.value;
-        } else {
+            console.log(e.target.name)
             if(e.target.name === "body"){
-                this.changeBody(e)
-                currentEndpoint.stringBody = e.target.value
-            }else{
-                currentEndpoint[e.target.name] = e.target.value;
+                this.checkValidBody(e.target.value)
             }
+        } else {
+            currentEndpoint[e.target.name] = e.target.value;
         }
         this.setState({ currentEndpoint }); 
     }
@@ -268,7 +285,6 @@ class EndpointsList extends React.Component {
                 ...endpoint,
                 httpRequest: { ...endpoint.httpRequest },
                 httpResponse: { ...endpoint.httpResponse },
-                stringBody: JSON.stringify(endpoint.httpResponse.body, null, 2),
                 newHeaders: this.getNewHeaders(endpoint.httpResponse.headers)
             },
             newEndpoint: false

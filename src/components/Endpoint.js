@@ -109,6 +109,10 @@ class Endpoint extends React.Component{
         }
     }
 
+    getBodyErrorMessage = () => {
+        return `Invalid ${this.props.data.httpResponse.bodyType.toUpperCase()}. Please fix it before hitting save`
+    }
+
     render() {
         const formItemLayout = {
             labelCol: {
@@ -174,7 +178,7 @@ class Endpoint extends React.Component{
                         <h2>Response</h2>
 
                         <Form.Item label="Status code">
-                            <Input style={{ width: 80 }}
+                            <Input style={{ width: 90 }}
                                 maxLength={3}
                                 id="status_code" value={this.props.data.httpResponse.status_code} name="status_code"
                                 onChange={(e) => this.handleChange({...e}, 'httpResponse')}
@@ -194,18 +198,27 @@ class Endpoint extends React.Component{
                         
                         {this.renderHeaders(this.props.data.newHeaders)}
                         
-                        <Form.Item label="Body" className={this.props.bodyClass}>
-                            <Popover title="Response body" placement="topRight" trigger="hover"
-                                    content="Body must be a json object">
-                                <Input.TextArea 
-                                    rows={6} id="body" 
-                                    value={this.props.data.stringBody} name="body"
-                                    onChange={(e) => this.props.handleChange(e)}
-                                />
-                            </Popover>
-                            {this.props.bodyClass === "error" ? <p>Invalid JSON. Please fix it before hitting save</p> : ""}
+                        <Form.Item label="Body Type">
+                            <Select defaultValue={this.props.data.httpResponse.bodyType || "json"} 
+                                    onChange={(e) => this.props.handleChange({ target: { name: "bodyType", value: e } }, 'httpResponse')}
+                                    style={{ width: "17%" }}
+                                    id="bodyType" name="bodyType"
+                                    value={this.props.data.httpResponse.bodyType}
+                            >
+                                <Option value="json">JSON</Option>
+                                <Option value="text">TEXT</Option>
+                                <Option value="xml">XML</Option>
+                            </Select>
                         </Form.Item>
-                        <Button type="primary" onClick={() => this.props.saveEndpoint()} style={{float: "right"}}>{this.getButtonText()}</Button>
+                        <Form.Item label="Body" className={this.props.bodyClass}>
+                            <Input.TextArea 
+                                rows={6} id="body" 
+                                value={this.props.data.httpResponse.body} name="body"
+                                onChange={(e) => this.props.handleChange(e, "httpResponse")}
+                            />
+                            {this.props.bodyClass === "error" ? <p>{this.getBodyErrorMessage()}</p> : ""}
+                        </Form.Item>
+                        <Button type="primary" disabled={this.props.bodyClass === "error"} onClick={() => this.props.saveEndpoint()} style={{float: "right"}}>{this.getButtonText()}</Button>
                         {!this.props.isNewEndpoint && <Button type="danger" onClick={() => this.showDeleteConfirm(this.props.deleteEndpoint)}>Delete</Button> }
                     </Form>
                 </Card>

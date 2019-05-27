@@ -35,7 +35,13 @@ class EndpointCard extends React.Component{
         </span>)
     }
 
-
+    getStringBody = ({body, bodyType}) => {
+        if(bodyType === "json"){
+            return JSON.stringify(body, null, 2)
+        }else {
+            return body
+        }
+    }
 
     render(){
         const {index, endpoint, selectedId, prefix} = this.props
@@ -62,7 +68,7 @@ class EndpointCard extends React.Component{
                 </div>
                 <p style={{fontWeight: 600}}>{endpoint.httpResponse.status_code}</p>
                 <pre style={{backgroundColor: "#ffffff", border: "1px dashed #585858", padding: "5px"}}>
-                    {JSON.stringify(endpoint.httpResponse.body, null, 2)}
+                    {endpoint.httpResponse.body}
                 </pre>
                 <span>Published path: </span>
                 <a target="_blank" rel="noopener noreferrer" href={this.publishedPath(prefix,endpoint.httpRequest.path)}>
